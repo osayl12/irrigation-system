@@ -3,17 +3,6 @@ class EspModel {
     this.db = db;
   }
 
-  async getByPot(potId) {
-    const sql = `
-      SELECT sensorname, val_avg, date
-      FROM sensors
-      WHERE pot_id = ?
-      ORDER BY date DESC
-    `;
-    const [rows] = await this.db.execute(sql, [potId]);
-    return rows;
-  }
-
   async create(sensorName, avg, potId) {
     const sql = `
       INSERT INTO sensors (sensorname, val_avg, pot_id, date)
@@ -25,6 +14,17 @@ class EspModel {
       potId,
     ]);
     return res.insertId;
+  }
+
+  async getByPot(potId) {
+    const sql = `
+      SELECT sensorname, val_avg, date
+      FROM sensors
+      WHERE pot_id = ?
+      ORDER BY date DESC
+    `;
+    const [rows] = await this.db.execute(sql, [potId]);
+    return rows;
   }
 }
 
