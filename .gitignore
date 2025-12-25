@@ -1,0 +1,19 @@
+# Node
+node_modules/
+.env
+
+# React
+client/node_modules/
+client/dist/
+
+# Logs
+npm-debug.log*
+
+# Arduino
+*.bin
+*.elf
+*.map
+
+# OS
+.DS_Store
+Thumbs.db
