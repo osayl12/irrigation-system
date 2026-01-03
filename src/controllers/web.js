@@ -44,4 +44,26 @@ const getStrains = async (req, res) => {
   }
 };
 
-module.exports = { getSensors, getIrrigations, getPots, getStrains };
+const deleteSensor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await web.deleteSensor(id);
+    res.json({ message: "Sensor deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const deleteIrrigation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await web.deleteIrrigation(id);
+    res.json({ message: "Irrigation deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { getSensors, getIrrigations, getPots, getStrains, deleteSensor, deleteIrrigation };

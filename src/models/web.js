@@ -24,6 +24,20 @@ class Web {
   getStrains() {
     return this.db.execute(`SELECT * FROM strains ORDER BY id DESC`);
   }
+  deleteSensor(id) {
+  return this.db.execute(
+    "DELETE FROM sensors WHERE id = ?",
+    [id]
+  );
+}
+
+deleteIrrigation(id) {
+  return this.db.execute(
+    "DELETE FROM irrigation_system WHERE id = ?",
+    [id]
+  );
+}
+
 }
 
 module.exports = Web;
