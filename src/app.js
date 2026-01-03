@@ -4,23 +4,15 @@ const morgan = require("morgan");
 const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-const db = require("./models/db");
-
-db.query("SELECT 1")
-  .then(() => console.log("✅ Database connected successfully"))
-  .catch(err => console.error("❌ DB connection failed:", err));
-
-
-app.use(express.json());
+app.use(express.json()); // 👈 חובה לפני routes
+app.use(express.urlencoded({ extended: true })); // 👈 חשוב ל־ESP בהמשך
 app.use(cors());
 app.use(morgan("dev"));
 
-app.get("/", (req, res) => {
-  res.send("Irrigation System Server is running");
-});
+const routes = require("./routes");
+app.use("/", routes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server running");
 });
