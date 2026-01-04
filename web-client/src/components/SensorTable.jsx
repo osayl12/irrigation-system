@@ -4,10 +4,18 @@ import React from "react";
 export default function SensorTable() {
   const [sensors, setSensors] = useState([]);
 
-  useEffect(() => {
-    api.get("/web/sensors")
-      .then(res => setSensors(res.data))
-      .catch(console.error);
+useEffect(() => {
+    const fetchSensors = () => {
+      api.get("/web/sensors")
+        .then(res => setSensors(res.data))
+        .catch(console.error);
+    };
+
+    fetchSensors(); // טעינה ראשונית
+
+    const interval = setInterval(fetchSensors, 5000); // כל 5 שניות
+
+    return () => clearInterval(interval); // ניקוי
   }, []);
 
   const deleteSensor = (id) => {

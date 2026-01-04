@@ -5,9 +5,17 @@ export default function IrrigationTable() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    api.get("/web/irrigations")
-      .then(res => setData(res.data))
-      .catch(console.error);
+    const fetchIrrigations = () => {
+      api.get("/web/irrigations")
+        .then(res => setData(res.data))
+        .catch(console.error);
+    };
+
+    fetchIrrigations();
+
+    const interval = setInterval(fetchIrrigations, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const deleteIrrigation = (id) => {
