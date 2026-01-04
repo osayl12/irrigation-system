@@ -5,14 +5,21 @@ const {
   getPots,
   getStrains,
   deleteSensor,
-  deleteIrrigation
+  deleteIrrigation,
+  updateSensor,
+  updateIrrigation
 } = require("../controllers/web");
 
 router.get("/sensors", getSensors);
 router.get("/irrigations", getIrrigations);
 router.get("/pots", getPots);
 router.get("/strains", getStrains);
+
 router.delete("/sensors/:id", deleteSensor);
 router.delete("/irrigations/:id", deleteIrrigation);
+
+router.patch("/sensors/:id", updateSensor);
+router.patch("/irrigations/:id", updateIrrigation);
+
 
 module.exports = router;
