@@ -12,6 +12,9 @@ router.patch("/irrigations/:id", c.updateIrrigation);
 */
 router.get("/stats/weekly", c.getWeeklyStats);
 
+router.get("/warnings", c.getWarnings);
+
+
 router.post("/pump", c.setPump);
 router.post("/mode", c.setMode);
 router.post("/schedule", c.setSchedule);

@@ -1,12 +1,6 @@
-const pool = require("../models/db");
-const Web = require("../models/web");
 const mqtt = require("../mqtt/mqttClient");
-const web = new Web(pool);
 
-/* ---------- STATE ---------- */
-let pump = false;
-let mode = "MANUAL";
-let schedule = { start: "06:00", end: "18:00", times: 2 };
+
 
 /* ---------- READ ---------- */
 /*
@@ -95,28 +89,47 @@ const getWeeklyStats = async (req, res) => {
   );
 };
 
-/* ---------- DASHBOARD ---------- */
+/* ===== GET system status ===== */
+const getStatus = (req, res) => {
+  res.json(mqtt.getStatus());
+};
+
+/* ===== GET warnings ===== */
+const getWarnings = (req, res) => {
+  res.json(mqtt.getLastWarning());
+};
+
+/* ===== Pump control ===== */
 const setPump = (req, res) => {
-  const { state } = req.body;
-  mqtt.publish("irrigation/pump", JSON.stringify({ state }));
-  res.json({ pump: state });
+  const { state, force = false } = req.body;
+
+  mqtt.client.publish(
+    "irrigation/pump",
+    JSON.stringify({ state, force })
+  );
+
+  if (force) mqtt.clearWarning();
+
+  res.json({ success: true });
 };
 
-
+/* ===== Mode control ===== */
 const setMode = (req, res) => {
-  mode = req.body.mode;
-  mqtt.publish("irrigation/mode", JSON.stringify({ mode }));
-  res.json({ mode });
+  const { mode } = req.body;
+  mqtt.client.publish(
+    "irrigation/mode",
+    JSON.stringify({ mode })
+  );
+  res.json({ success: true });
 };
 
+/* ===== Schedule ===== */
 const setSchedule = (req, res) => {
-  schedule = req.body;
-  mqtt.publish("irrigation/schedule", JSON.stringify(schedule));
-  res.json(schedule);
-};
-
-const getStatus = (_, res) => {
-  res.json({ pump, mode, schedule });
+  mqtt.client.publish(
+    "irrigation/schedule",
+    JSON.stringify(req.body)
+  );
+  res.json({ success: true });
 };
 
 module.exports = {
@@ -128,6 +141,7 @@ module.exports = {
   updateSensor,
   updateIrrigation,
 */
+  getWarnings,
   getWeeklyStats,
   setPump,
   setMode,

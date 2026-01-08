@@ -1,54 +1,54 @@
 import React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api/api";
+import LightWarningPopup from "./LightWarningPopup";
 
 export default function PumpToggle() {
-  const [isOn, setIsOn] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [pumpOn, setPumpOn] = useState(false);
+  const [warning, setWarning] = useState(null);
 
-  const togglePump = async () => {
-    setLoading(true);
-    setError(false);
+  /* בדיקת אזהרות כל כמה שניות */
+  useEffect(() => {
+    const fetchWarning = () => {
+      api.get("/web/warnings")
+        .then(res => setWarning(res.data))
+        .catch(() => {});
+    };
 
-    try {
-      await api.post("/web/pump", { state: !isOn });
-      setIsOn(prev => !prev);
-    } catch (err) {
-      console.error("PumpToggle error:", err);
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+    fetchWarning();
+    const interval = setInterval(fetchWarning, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  /* בקשת הדלקה רגילה */
+  const turnOn = () => {
+    api.post("/web/pump", { state: true });
+  };
+
+  /* אישור הדלקה בכוח */
+  const forceTurnOn = () => {
+    api.post("/web/pump", { state: true, force: true })
+      .then(() => setWarning(null));
+  };
+
+  /* כיבוי */
+  const turnOff = () => {
+    api.post("/web/pump", { state: false });
+    setWarning(null);
   };
 
   return (
-    <div style={{ marginBottom: "20px" }}>
+    <div>
       <h3>Pump Control</h3>
 
-      <button
-        onClick={togglePump}
-        disabled={loading}
-        style={{
-          backgroundColor: isOn ? "#c62828" : "#2e7d32",
-          color: "white",
-          padding: "10px 20px",
-          fontSize: "16px",
-          cursor: loading ? "not-allowed" : "pointer"
-        }}
-      >
-        {loading
-          ? "Processing..."
-          : isOn
-          ? "Turn OFF Pump"
-          : "Turn ON Pump"}
-      </button>
+      <button onClick={turnOn}>ON</button>
+      <button onClick={turnOff}>OFF</button>
 
-      {error && (
-        <p style={{ color: "red", marginTop: "8px" }}>
-          Server not responding
-        </p>
-      )}
+      <LightWarningPopup
+        warning={warning}
+        onConfirm={forceTurnOn}
+        onCancel={() => setWarning(null)}
+      />
     </div>
   );
 }
