@@ -16,9 +16,8 @@ app.use(morgan("dev"));
 
 /* ---------- routes ---------- */
 const routes = require("./routes");
-app.get("/", (req, res) => {
-  res.send("API is running");
-});
+app.use("/", routes);
+
 
 app.listen(PORT || 3000, () => {
   console.log(`🚀 Local: http://localhost:${PORT || 3000}`);

@@ -1,9 +1,7 @@
 const router = require("express").Router();
-const {   createAvgSensor,createIrrigation } = require("../controllers/esp");
+const { createSensor, createIrrigation } = require("../controllers/esp");
 
-router.post("/create", createAvgSensor);
-
-router.post("/sensors", createAvgSensor);
-router.post("/irrigations", createIrrigation);
+router.post("/sensor", createSensor);
+router.post("/irrigation", createIrrigation);
 
 module.exports = router;

@@ -1,167 +1,96 @@
 const pool = require("../models/db");
 const Web = require("../models/web");
+const mqtt = require("../mqtt/mqttClient");
 const web = new Web(pool);
 
-const getSensors = async (req, res) => {
-  try {
-    const limit = req.query.limit || 100;
-    const [rows] = await web.getSensors(limit);
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
+/* ---------- STATE ---------- */
+let pump = false;
+let mode = "MANUAL";
+let schedule = { start: "06:00", end: "18:00", times: 2 };
+
+/* ---------- READ ---------- */
+const getSensors = async (_, res) => {
+  const [rows] = await web.getSensors();
+  res.json(rows);
 };
 
-
-
-const getIrrigations = async (req, res) => {
-  try {
-    const limit = req.query.limit || 100;
-    const [rows] = await web.getIrrigations(limit);
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
+const getIrrigations = async (_, res) => {
+  const [rows] = await web.getIrrigations();
+  res.json(rows);
 };
 
-const getPots = async (req, res) => {
-  try {
-    const [rows] = await web.getPots();
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-const getStrains = async (req, res) => {
-  try {
-    const [rows] = await web.getStrains();
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-const getWeeklyStats = async (req, res) => {
-  try {
-    const { type } = req.query;
-
-    if (!type) {
-      return res.status(400).json({ message: "type is required" });
-    }
-
-    let sql = "";
-
-    if (type === "temp") {
-      sql = `
-        SELECT date, AVG(Val_avg) AS avg_value
-        FROM sensors
-        WHERE SensorName = 'temp'
-          AND date >= CURDATE() - INTERVAL 7 DAY
-        GROUP BY date
-        ORDER BY date
-      `;
-    } 
-    else if (type === "soil") {
-      sql = `
-        SELECT date, AVG(Val_avg) AS avg_value
-        FROM sensors
-        WHERE SensorName = 'soil'
-          AND date >= CURDATE() - INTERVAL 7 DAY
-        GROUP BY date
-        ORDER BY date
-      `;
-    } 
-    else if (type === "water") {
-      sql = `
-        SELECT date, SUM(count) AS avg_value
-        FROM irrigation_system
-        WHERE date >= CURDATE() - INTERVAL 7 DAY
-        GROUP BY date
-        ORDER BY date
-      `;
-    } 
-    else {
-      return res.status(400).json({ message: "Invalid type" });
-    }
-
-    const [rows] = await pool.execute(sql);
-    return res.json(rows);
-
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
+/* ---------- DELETE ---------- */
 const deleteSensor = async (req, res) => {
-  try {
-    const { id } = req.params;
-    await web.deleteSensor(id);
-    res.json({ message: "Sensor deleted successfully" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
+  await web.deleteSensor(req.params.id);
+  res.json({ success: true });
 };
 
 const deleteIrrigation = async (req, res) => {
-  try {
-    const { id } = req.params;
-    await web.deleteIrrigation(id);
-    res.json({ message: "Irrigation deleted successfully" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
+  await web.deleteIrrigation(req.params.id);
+  res.json({ success: true });
 };
 
+/* ---------- UPDATE ---------- */
 const updateSensor = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    await web.updateSensor(id, req.body);
-
-    return res.json({
-      message: "Sensor updated successfully"
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      message: "Server error"
-    });
-  }
+  await web.updateSensor(req.params.id, req.body);
+  res.json({ success: true });
 };
 
 const updateIrrigation = async (req, res) => {
-  try {
-    const { id } = req.params;
+  await web.updateIrrigation(req.params.id, req.body);
+  res.json({ success: true });
+};
 
-    await web.updateIrrigation(id, req.body);
+/* ---------- STATS ---------- */
+const getWeeklyStats = async (req, res) => {
+  const { type } = req.query;
+  let sql = "";
 
-    return res.json({
-      message: "Irrigation updated successfully"
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      message: "Server error"
-    });
-  }
+  if (type === "temp")
+    sql = `SELECT date, AVG(Val_avg) avg_value FROM sensors WHERE SensorName='temp' GROUP BY date`;
+  else if (type === "soil")
+    sql = `SELECT date, AVG(Val_avg) avg_value FROM sensors WHERE SensorName='soil' GROUP BY date`;
+  else if (type === "water")
+    sql = `SELECT date, SUM(count) avg_value FROM irrigation_system GROUP BY date`;
+
+  const [rows] = await pool.execute(sql);
+  res.json(rows);
+};
+
+/* ---------- DASHBOARD ---------- */
+const setPump = (req, res) => {
+  const { state } = req.body;
+  mqtt.publish("irrigation/pump", JSON.stringify({ state }));
+  res.json({ pump: state });
+};
+
+
+const setMode = (req, res) => {
+  mode = req.body.mode;
+  mqtt.publish("irrigation/mode", JSON.stringify({ mode }));
+  res.json({ mode });
+};
+
+const setSchedule = (req, res) => {
+  schedule = req.body;
+  mqtt.publish("irrigation/schedule", JSON.stringify(schedule));
+  res.json(schedule);
+};
+
+const getStatus = (_, res) => {
+  res.json({ pump, mode, schedule });
 };
 
 module.exports = {
   getSensors,
   getIrrigations,
-  getPots,
-  getStrains,
   deleteSensor,
   deleteIrrigation,
   updateSensor,
   updateIrrigation,
-  getWeeklyStats
+  getWeeklyStats,
+  setPump,
+  setMode,
+  setSchedule,
+  getStatus
 };
