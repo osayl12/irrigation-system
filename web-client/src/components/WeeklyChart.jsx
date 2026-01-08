@@ -6,7 +6,9 @@ import {
   PointElement,
   LineElement,
   Tooltip,
-  Legend
+  Legend,
+  Filler,
+  Title
 } from "chart.js";
 
 import { Line } from "react-chartjs-2";
@@ -16,8 +18,10 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 export default function WeeklyChart({ title, labels, values }) {
