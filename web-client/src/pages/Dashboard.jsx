@@ -7,12 +7,27 @@ import SystemStatus from "../components/SystemStatus";
 export default function Dashboard() {
   return (
     <>
-      <h2>Dashboard</h2>
+      <div className="container">
+      <h2>🌱 Irrigation Dashboard</h2>
 
-      <PumpToggle />
-      <ModeSelector />
-      <ScheduleSettings />
-      <SystemStatus />
+      <div className="grid">
+        <div className="card">
+          <PumpToggle />
+        </div>
+
+        <div className="card">
+          <SystemStatus />
+        </div>
+      </div>
+
+      <div className="card">
+        <ModeSelector />
+      </div>
+
+      <div className="card">
+        <ScheduleSettings />
+      </div>
+    </div>
     </>
   );
 }

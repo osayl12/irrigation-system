@@ -21,21 +21,41 @@ ChartJS.register(
 );
 
 export default function WeeklyChart({ title, labels, values }) {
-  return (
-    <Line
-      data={{
-        labels,
-        datasets: [
-          {
-            label: title,
-            data: values,
-            borderColor: "blue",
-            backgroundColor: "rgba(0,0,255,0.2)",
-            tension: 0.3
-          }
-        ]
-      }}
-      options={{ responsive: true }}
-    />
-  );
+  if (!labels || !values || labels.length === 0) {
+    return <p>No data available</p>;
+  }
+
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: title,
+        data: values,
+        borderColor: "#1976d2",
+        backgroundColor: "rgba(25,118,210,0.2)",
+        tension: 0.3,
+        fill: true
+      }
+    ]
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false
+      },
+      title: {
+        display: true,
+        text: title
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
+
+  return <Line data={data} options={options} />;
 }

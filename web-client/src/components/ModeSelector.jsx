@@ -10,35 +10,25 @@ const MODES = [
 ];
 
 export default function ModeSelector() {
-  const [activeMode, setActiveMode] = useState(null);
+  const [active, setActive] = useState("MANUAL");
 
-  const setMode = async (mode) => {
-    try {
-      await api.post("/web/mode", { mode });
-      setActiveMode(mode);
-    } catch {
-      alert("Failed to change mode");
-    }
+  const selectMode = mode => {
+    setActive(mode);
+    api.post("/web/mode", { mode });
   };
 
   return (
-    <div>
-      <h3>Operation Mode</h3>
-
+    <>
+      <h3>Mode Selection</h3>
       {MODES.map(m => (
         <button
           key={m.key}
-          onClick={() => setMode(m.key)}
-          style={{
-            margin: "5px",
-            padding: "10px",
-            backgroundColor: activeMode === m.key ? "#1976d2" : "#ccc",
-            color: "white"
-          }}
+          className={`primary ${active === m.key ? "active" : ""}`}
+          onClick={() => selectMode(m.key)}
         >
           {m.label}
         </button>
       ))}
-    </div>
+    </>
   );
 }
