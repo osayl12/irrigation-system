@@ -13,6 +13,8 @@ const getSensors = async (req, res) => {
   }
 };
 
+
+
 const getIrrigations = async (req, res) => {
   try {
     const limit = req.query.limit || 100;
@@ -41,6 +43,58 @@ const getStrains = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getWeeklyStats = async (req, res) => {
+  try {
+    const { type } = req.query;
+
+    if (!type) {
+      return res.status(400).json({ message: "type is required" });
+    }
+
+    let sql = "";
+
+    if (type === "temp") {
+      sql = `
+        SELECT date, AVG(Val_avg) AS avg_value
+        FROM sensors
+        WHERE SensorName = 'temp'
+          AND date >= CURDATE() - INTERVAL 7 DAY
+        GROUP BY date
+        ORDER BY date
+      `;
+    } 
+    else if (type === "soil") {
+      sql = `
+        SELECT date, AVG(Val_avg) AS avg_value
+        FROM sensors
+        WHERE SensorName = 'soil'
+          AND date >= CURDATE() - INTERVAL 7 DAY
+        GROUP BY date
+        ORDER BY date
+      `;
+    } 
+    else if (type === "water") {
+      sql = `
+        SELECT date, SUM(count) AS avg_value
+        FROM irrigation_system
+        WHERE date >= CURDATE() - INTERVAL 7 DAY
+        GROUP BY date
+        ORDER BY date
+      `;
+    } 
+    else {
+      return res.status(400).json({ message: "Invalid type" });
+    }
+
+    const [rows] = await pool.execute(sql);
+    return res.json(rows);
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -108,5 +162,6 @@ module.exports = {
   deleteSensor,
   deleteIrrigation,
   updateSensor,
-  updateIrrigation
+  updateIrrigation,
+  getWeeklyStats
 };

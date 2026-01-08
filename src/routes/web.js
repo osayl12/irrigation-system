@@ -7,13 +7,15 @@ const {
   deleteSensor,
   deleteIrrigation,
   updateSensor,
-  updateIrrigation
+  updateIrrigation,
+    getWeeklyStats  
 } = require("../controllers/web");
 
 router.get("/sensors", getSensors);
 router.get("/irrigations", getIrrigations);
 router.get("/pots", getPots);
 router.get("/strains", getStrains);
+router.get("/stats/weekly", getWeeklyStats);
 
 router.delete("/sensors/:id", deleteSensor);
 router.delete("/irrigations/:id", deleteIrrigation);
