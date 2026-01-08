@@ -9,6 +9,7 @@ let mode = "MANUAL";
 let schedule = { start: "06:00", end: "18:00", times: 2 };
 
 /* ---------- READ ---------- */
+/*
 const getSensors = async (_, res) => {
   const [rows] = await web.getSensors();
   res.json(rows);
@@ -20,6 +21,7 @@ const getIrrigations = async (_, res) => {
 };
 
 /* ---------- DELETE ---------- */
+/*
 const deleteSensor = async (req, res) => {
   await web.deleteSensor(req.params.id);
   res.json({ success: true });
@@ -31,6 +33,7 @@ const deleteIrrigation = async (req, res) => {
 };
 
 /* ---------- UPDATE ---------- */
+/*
 const updateSensor = async (req, res) => {
   await web.updateSensor(req.params.id, req.body);
   res.json({ success: true });
@@ -41,20 +44,55 @@ const updateIrrigation = async (req, res) => {
   res.json({ success: true });
 };
 
+
 /* ---------- STATS ---------- */
 const getWeeklyStats = async (req, res) => {
-  const { type } = req.query;
+  const { type, mode } = req.query;
+
   let sql = "";
 
-  if (type === "temp")
-    sql = `SELECT date, AVG(Val_avg) avg_value FROM sensors WHERE SensorName='temp' GROUP BY date`;
-  else if (type === "soil")
-    sql = `SELECT date, AVG(Val_avg) avg_value FROM sensors WHERE SensorName='soil' GROUP BY date`;
-  else if (type === "water")
-    sql = `SELECT date, SUM(count) avg_value FROM irrigation_system GROUP BY date`;
+  // === בחירת הנתון ===
+  if (type === "temp") {
+    sql = `
+      SELECT date, AVG(Val_avg) AS avg_value
+      FROM sensors
+      WHERE SensorName = 'temp'
+      GROUP BY date
+      ORDER BY date
+    `;
+  }
+
+  else if (type === "soil") {
+    sql = `
+      SELECT date, AVG(Val_avg) AS avg_value
+      FROM sensors
+      WHERE SensorName = 'soil'
+      GROUP BY date
+      ORDER BY date
+    `;
+  }
+
+  else if (type === "water") {
+    sql = `
+      SELECT date, SUM(count) AS avg_value
+      FROM irrigation_system
+      GROUP BY date
+      ORDER BY date
+    `;
+  }
+
+  if (!sql) {
+    return res.status(400).json({ message: "Invalid type" });
+  }
 
   const [rows] = await pool.execute(sql);
-  res.json(rows);
+
+  res.json(
+    rows.map(r => ({
+      ...r,
+      mode 
+    }))
+  );
 };
 
 /* ---------- DASHBOARD ---------- */
@@ -82,12 +120,14 @@ const getStatus = (_, res) => {
 };
 
 module.exports = {
+  /*
   getSensors,
   getIrrigations,
   deleteSensor,
   deleteIrrigation,
   updateSensor,
   updateIrrigation,
+*/
   getWeeklyStats,
   setPump,
   setMode,

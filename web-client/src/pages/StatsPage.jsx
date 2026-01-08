@@ -29,8 +29,8 @@ export default function StatsPage() {
     api
       .get(`/web/stats/weekly?mode=${mode}&type=${metric}`)
       .then(res => {
-        setLabels(res.data.map(r => r.date));
-        setValues(res.data.map(r => r.avg_value));
+        setLabels(res.data.map(r =>     new Date(r.date).toLocaleDateString("he-IL")));
+        setValues(res.data.map(r => Number(r.avg_value)));
       })
       .catch(() => setError(true));
   }, [mode, metric]);
