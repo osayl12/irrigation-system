@@ -1,0 +1,3 @@
+[33m479df64[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Revert "config: add global configuration and hardware definitions"
+[33mbfc3ec0[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m config: add global configuration and hardware definitions
+[33ma1d916c[m chore: initialize ESP32 irrigation project structure"
