@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { api } from "../api/api";
 
 export default function ScheduleSettings() {
@@ -10,9 +9,9 @@ export default function ScheduleSettings() {
   const saveSettings = async () => {
     try {
       await api.post("/web/schedule", {
-        start_time: start,
-        end_time: end,
-        times_per_day: times
+        start,
+        end,
+        times
       });
       alert("Schedule saved");
     } catch {
@@ -26,14 +25,22 @@ export default function ScheduleSettings() {
 
       <label>
         Start:
-        <input type="time" value={start} onChange={e => setStart(e.target.value)} />
+        <input
+          type="time"
+          value={start}
+          onChange={e => setStart(e.target.value)}
+        />
       </label>
 
       <br />
 
       <label>
         End:
-        <input type="time" value={end} onChange={e => setEnd(e.target.value)} />
+        <input
+          type="time"
+          value={end}
+          onChange={e => setEnd(e.target.value)}
+        />
       </label>
 
       <br />
@@ -45,7 +52,7 @@ export default function ScheduleSettings() {
           min="1"
           max="6"
           value={times}
-          onChange={e => setTimes(e.target.value)}
+          onChange={e => setTimes(Number(e.target.value))}
         />
       </label>
 
