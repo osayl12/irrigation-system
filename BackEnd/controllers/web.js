@@ -1,44 +1,80 @@
 const mqtt = require("../mqtt/mqttClient");
 const pool = require("../models/db");
 
-
-
-/* ---------- READ ---------- */
-/*
-const getSensors = async (_, res) => {
-  const [rows] = await web.getSensors();
-  res.json(rows);
+// ---------- READ ----------
+const getSensors = async (_req, res) => {
+  try {
+    const [rows] = await pool.execute("SELECT * FROM sensors ORDER BY id DESC");
+    res.json(rows);
+  } catch {
+    res.status(500).json({ error: "Failed to fetch sensors" });
+  }
 };
 
-const getIrrigations = async (_, res) => {
-  const [rows] = await web.getIrrigations();
-  res.json(rows);
+const getIrrigations = async (_req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      "SELECT * FROM irrigation_system ORDER BY id DESC",
+    );
+    res.json(rows);
+  } catch {
+    res.status(500).json({ error: "Failed to fetch irrigations" });
+  }
 };
 
-/* ---------- DELETE ---------- */
-/*
+// ---------- DELETE ----------
 const deleteSensor = async (req, res) => {
-  await web.deleteSensor(req.params.id);
-  res.json({ success: true });
+  try {
+    await pool.execute("DELETE FROM sensors WHERE id = ?", [req.params.id]);
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: "Failed to delete sensor" });
+  }
 };
 
 const deleteIrrigation = async (req, res) => {
-  await web.deleteIrrigation(req.params.id);
-  res.json({ success: true });
+  try {
+    await pool.execute("DELETE FROM irrigation_system WHERE id = ?", [
+      req.params.id,
+    ]);
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: "Failed to delete irrigation" });
+  }
 };
 
-/* ---------- UPDATE ---------- */
-/*
+// ---------- UPDATE ----------
 const updateSensor = async (req, res) => {
-  await web.updateSensor(req.params.id, req.body);
-  res.json({ success: true });
+  try {
+    const allowed = ["SensorName", "Val_avg", "Pot_id"];
+    const keys = Object.keys(req.body).filter((k) => allowed.includes(k));
+    if (!keys.length) return res.status(400).json({ error: "No valid fields" });
+
+    const sql = `UPDATE sensors SET ${keys.map((k) => `${k}=?`).join(",")} WHERE id=?`;
+    const values = [...keys.map((k) => req.body[k]), req.params.id];
+
+    await pool.execute(sql, values);
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: "Failed to update sensor" });
+  }
 };
 
 const updateIrrigation = async (req, res) => {
-  await web.updateIrrigation(req.params.id, req.body);
-  res.json({ success: true });
-};
+  try {
+    const allowed = ["count", "pot_id"];
+    const keys = Object.keys(req.body).filter((k) => allowed.includes(k));
+    if (!keys.length) return res.status(400).json({ error: "No valid fields" });
 
+    const sql = `UPDATE irrigation_system SET ${keys.map((k) => `${k}=?`).join(",")} WHERE id=?`;
+    const values = [...keys.map((k) => req.body[k]), req.params.id];
+
+    await pool.execute(sql, values);
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: "Failed to update irrigation" });
+  }
+};
 
 /* ---------- STATS ---------- */
 const getWeeklyStats = async (req, res) => {
@@ -55,9 +91,7 @@ const getWeeklyStats = async (req, res) => {
       GROUP BY date
       ORDER BY date
     `;
-  }
-
-  else if (type === "soil") {
+  } else if (type === "soil") {
     sql = `
       SELECT date, AVG(Val_avg) AS avg_value
       FROM sensors
@@ -65,9 +99,7 @@ const getWeeklyStats = async (req, res) => {
       GROUP BY date
       ORDER BY date
     `;
-  }
-
-  else if (type === "water") {
+  } else if (type === "water") {
     sql = `
       SELECT date, SUM(count) AS avg_value
       FROM irrigation_system
@@ -83,10 +115,10 @@ const getWeeklyStats = async (req, res) => {
   const [rows] = await pool.execute(sql);
 
   res.json(
-    rows.map(r => ({
+    rows.map((r) => ({
       ...r,
-      mode 
-    }))
+      mode,
+    })),
   );
 };
 
@@ -104,10 +136,7 @@ const getWarnings = (req, res) => {
 const setPump = (req, res) => {
   const { state, force = false } = req.body;
 
-  mqtt.client.publish(
-    "irrigation/pump",
-    JSON.stringify({ state, force })
-  );
+  mqtt.client.publish("irrigation/pump", JSON.stringify({ state, force }));
 
   if (force) mqtt.clearWarning();
 
@@ -117,35 +146,29 @@ const setPump = (req, res) => {
 /* ===== Mode control ===== */
 const setMode = (req, res) => {
   const { mode } = req.body;
-  mqtt.client.publish(
-    "irrigation/mode",
-    JSON.stringify({ mode })
-  );
+  mqtt.client.publish("irrigation/mode", JSON.stringify({ mode }));
   res.json({ success: true });
 };
 
 /* ===== Schedule ===== */
 const setSchedule = (req, res) => {
-  mqtt.client.publish(
-    "irrigation/schedule",
-    JSON.stringify(req.body)
-  );
+  mqtt.client.publish("irrigation/schedule", JSON.stringify(req.body));
   res.json({ success: true });
 };
 
 module.exports = {
-  /*
+  
   getSensors,
   getIrrigations,
   deleteSensor,
   deleteIrrigation,
   updateSensor,
   updateIrrigation,
-*/
+
   getWarnings,
   getWeeklyStats,
   setPump,
   setMode,
   setSchedule,
-  getStatus
+  getStatus,
 };
