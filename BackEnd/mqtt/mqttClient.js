@@ -1,5 +1,5 @@
 const mqtt = require("mqtt");
-const client = mqtt.connect("mqtt://172.20.10.4:1883");
+const client = mqtt.connect(process.env.MQTT_URL || "mqtt://localhost:1883");
 
 let lastWarning = null;
 let connected = false;
