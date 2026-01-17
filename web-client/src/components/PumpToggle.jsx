@@ -60,9 +60,7 @@ export default function PumpToggle() {
         ON
       </button>
 
-      <button onClick={turnOff} disabled={!pumpOn}>
-        OFF
-      </button>
+      <button onClick={turnOff}>OFF</button>
 
       <p>
         Status:

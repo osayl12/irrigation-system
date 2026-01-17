@@ -136,25 +136,39 @@ const getWarnings = (req, res) => {
 const setPump = (req, res) => {
   const { state, force = false } = req.body;
 
-  mqtt.client.publish("irrigation/pump", JSON.stringify({ state, force }));
+  let command = "OFF";
+
+  if (state && force) {
+    command = "FORCE_ON";
+  } else if (state) {
+    command = "ON";
+  }
+  mqtt.client.publish("irrigation/pump", command);
 
   if (force) mqtt.clearWarning();
 
   res.json({ success: true });
 };
 
+
+
 /* ===== Mode control ===== */
 const setMode = (req, res) => {
   const { mode } = req.body;
-  mqtt.client.publish("irrigation/mode", JSON.stringify({ mode }));
+  mqtt.client.publish("irrigation/mode", String(mode));
   res.json({ success: true });
 };
 
 /* ===== Schedule ===== */
 const setSchedule = (req, res) => {
-  mqtt.client.publish("irrigation/schedule", JSON.stringify(req.body));
+  const { times, duration } = req.body; // למשל 2 ו-120
+  mqtt.client.publish(
+    "irrigation/schedule",
+    `${times},${duration}`
+  );
   res.json({ success: true });
 };
+
 
 module.exports = {
   

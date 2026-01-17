@@ -34,9 +34,43 @@ export default function SystemStatus() {
   return (
     <div>
       <h3>System Status</h3>
+     <p>
+        MQTT:{" "}
+        <b style={{ color: status.mqttConnected ? "green" : "red" }}>
+          {status.mqttConnected ? "CONNECTED" : "DISCONNECTED"}
+        </b>
+      </p>
+
       <p>
-        MQTT:
-        <b className={status.mqttConnected ? "status-ok" : "status-off"}></b>
+        Pump:{" "}
+        <b style={{ color: status.pump ? "green" : "red" }}>
+          {status.pump ? "ON" : "OFF"}
+        </b>
+      </p>
+
+      <p>
+        Mode: <b>{status.mode}</b>
+      </p>
+
+      <p>
+        Temperature:{" "}
+        <b>
+          {status.temp !== null ? `${status.temp} °C` : "N/A"}
+        </b>
+      </p>
+
+      <p>
+        Soil Moisture:{" "}
+        <b>
+          {status.soil !== null ? status.soil : "N/A"}
+        </b>
+      </p>
+
+      <p>
+        Light Level:{" "}
+        <b>
+          {status.light !== null ? status.light : "N/A"}
+        </b>
       </p>
     </div>
   );
