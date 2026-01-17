@@ -15,8 +15,7 @@ app.use(cors());
 app.use(morgan("dev"));
 
 /* ---------- routes ---------- */
-const routes = require("./routes");
-app.use("/", routes);
+app.use("/", require("./routes"));
 
 
 app.listen(PORT || 3000, () => {

@@ -27,7 +27,9 @@ client.on("message", (topic, payload) => {
   if (topic === "irrigation/status") {
     try {
       lastStatus = JSON.parse(payload.toString());
-    } catch {}
+    } catch {
+      lastStatus = null;
+    }
   }
 });
 
@@ -41,5 +43,8 @@ module.exports = {
     mqttConnected: connected,
     pump: lastStatus?.pump ?? false,
     mode: lastStatus?.mode ?? "UNKNOWN",
+    temp: lastStatus?.temp ?? null,
+    soil: lastStatus?.soil ?? null,
+    light: lastStatus?.light ?? null,
   }),
 };
