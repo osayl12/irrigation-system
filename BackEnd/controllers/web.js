@@ -161,11 +161,22 @@ const setMode = (req, res) => {
 
 /* ===== Schedule ===== */
 const setSchedule = (req, res) => {
-  const { times, duration } = req.body; // למשל 2 ו-120
+  const { start, end, times } = req.body;
+
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+
+  const startMin = sh * 60 + sm;
+  const endMin = eh * 60 + em;
+  const windowMin = endMin - startMin;
+
+  const duration = Math.floor(windowMin / times);
+
   mqtt.client.publish(
     "irrigation/schedule",
     `${times},${duration}`
   );
+
   res.json({ success: true });
 };
 
