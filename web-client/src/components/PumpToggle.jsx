@@ -39,17 +39,20 @@ export default function PumpToggle() {
   /* ===== שליטה ===== */
   const turnOn = () => {
     api.post("/web/pump", { state: true });
+    setPumpOn(true);
   };
 
   const forceTurnOn = () => {
-    api
-      .post("/web/pump", { state: true, force: true })
-      .then(() => setWarning(null));
+    api.post("/web/pump", { state: true, force: true }).then(() => {
+      setPumpOn(true); 
+      setWarning(null);
+    });
   };
 
   const turnOff = () => {
     api.post("/web/pump", { state: false });
     setWarning(null);
+    setPumpOn(false);
   };
 
   return (
