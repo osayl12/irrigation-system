@@ -35,7 +35,8 @@ export default function SystemStatus() {
     <div>
       <h3>System Status</h3>
       <p>
-        MQTT: <b>{status.mqttConnected ? "CONNECTED" : "DISCONNECTED"}</b>
+        MQTT:
+        <b className={status.mqttConnected ? "status-ok" : "status-off"}></b>
       </p>
     </div>
   );

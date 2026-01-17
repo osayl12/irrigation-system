@@ -10,10 +10,17 @@ export default function StatsPage() {
   const [values, setValues] = useState([]);
 
   useEffect(() => {
-    api.get(`/web/stats/weekly?mode=${mode}&type=${metric}`)
-      .then(res => {
-        setLabels(res.data.map(r => new Date(r.date).toLocaleDateString("he-IL")));
-        setValues(res.data.map(r => Number(r.avg_value)));
+    api
+      .get(`/web/stats/weekly?mode=${mode}&type=${metric}`)
+      .then((res) => {
+        setLabels(
+          res.data.map((r) => new Date(r.date).toLocaleDateString("he-IL")),
+        );
+        setValues(res.data.map((r) => Number(r.avg_value)));
+      })
+      .catch(() => {
+        setLabels([]);
+        setValues([]);
       });
   }, [mode, metric]);
 
@@ -23,7 +30,7 @@ export default function StatsPage() {
 
       <div className="card">
         <h3>Mode</h3>
-        {["MANUAL","TEMP","SOIL","SHABBAT"].map(m => (
+        {["MANUAL", "TEMP", "SOIL", "SHABBAT"].map((m) => (
           <button
             key={m}
             className={mode === m ? "primary active" : "secondary"}
@@ -36,7 +43,7 @@ export default function StatsPage() {
 
       <div className="card">
         <h3>Data Type</h3>
-        {["water","temp","soil"].map(t => (
+        {["water", "temp", "soil"].map((t) => (
           <button
             key={t}
             className={metric === t ? "success active" : "secondary"}

@@ -7,6 +7,16 @@ export default function ScheduleSettings() {
   const [times, setTimes] = useState(2);
 
   const saveSettings = async () => {
+    if (start >= end) {
+      alert("End time must be after start time");
+      return;
+    }
+
+    if (times < 1) {
+      alert("Times per day must be at least 1");
+      return;
+    }
+
     try {
       await api.post("/web/schedule", {
         start,

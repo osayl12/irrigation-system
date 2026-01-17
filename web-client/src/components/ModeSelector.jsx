@@ -12,9 +12,13 @@ const MODES = [
 export default function ModeSelector() {
   const [active, setActive] = useState("MANUAL");
 
-  const selectMode = mode => {
+  const selectMode = async mode => {
     setActive(mode);
-    api.post("/web/mode", { mode });
+    try {
+      await api.post("/web/mode", { mode });
+    } catch {
+      alert("Failed to change mode");
+    }
   };
 
   return (
