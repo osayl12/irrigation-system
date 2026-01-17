@@ -8,8 +8,6 @@ export default function Dashboard() {
   return (
     <>
       <div className="container">
-      <h2>🌱 Irrigation Dashboard</h2>
-
       <div className="grid">
         <div className="card">
           <PumpToggle />

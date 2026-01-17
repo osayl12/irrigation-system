@@ -6,10 +6,16 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 export default function App() {
   return (
     <BrowserRouter>
-      <nav style={{ marginBottom: "20px" }}>
-        <Link to="/">Dashboard</Link> |{" "}
-        <Link to="/stats">Statistics</Link>
-      </nav>
+<nav className="navbar">
+  <div className="nav-inner">
+    <span className="logo">🌱 Irrigation System</span>
+    <div className="nav-links">
+      <Link to="/">Dashboard</Link>
+      <Link to="/stats">Statistics</Link>
+    </div>
+  </div>
+</nav>
+
 
       <Routes>
         <Route path="/" element={<Dashboard />} />
