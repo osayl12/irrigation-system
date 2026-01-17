@@ -18,7 +18,7 @@ export default function PumpToggle() {
     };
 
     fetchStatus();
-    const interval = setInterval(fetchStatus, 5000);
+    const interval = setInterval(fetchStatus, 3000);
     return () => clearInterval(interval);
   }, []);
 
