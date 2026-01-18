@@ -71,13 +71,13 @@ transform 0.1s ease;
 }
 
 /* מעבר עכבר */
-.nav-links a {
+.nav-links a:hover {
 opacity: 0.9;
 border-bottom: 2px solid rgba(255, 255, 255, 0.8);
 }
 
 /* לחיצה */
-.nav-links a {
+.nav-links a:active {
 transform: translateY(1px);
 }
 
@@ -128,14 +128,16 @@ transform 0.1s ease;
 }
 
 /* מעבר עכבר */
-button {
+button:hover {
 opacity: 0.9;
 }
 
 /* לחיצה */
-button {
+button:active{
 transform: scale(0.97);
 }
+
+
 
 /* סוגי כפתורים */
 button.primary {

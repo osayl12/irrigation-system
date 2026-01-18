@@ -2,49 +2,78 @@ const mqtt = require("mqtt");
 const client = mqtt.connect(process.env.MQTT_URL || "mqtt://localhost:1883");
 
 let lastWarning = null;
-let connected = false;
-let lastStatus = null;
+let lastUpdate = Date.now();
+
+let systemStatus = {
+  mqttConnected: false,
+  pump: false,
+  mode: "UNKNOWN",
+  temp: null,
+  soil: null,
+  light: null,
+};
 
 client.on("connect", () => {
-  connected = true;
-  client.subscribe("irrigation/warn");
-  client.subscribe("irrigation/status");
+  systemStatus.mqttConnected = true;
+
+  client.subscribe([
+    "irrigation/warn",
+    "irrigation/status",
+    "irrigation/mode",
+    "irrigation/sensors",
+  ]);
 });
 
 client.on("close", () => {
-  connected = false;
+  systemStatus.mqttConnected = false;
 });
 
 client.on("message", (topic, payload) => {
+  const msg = payload.toString();
+  lastUpdate = Date.now();
+
+  // ---- WARNINGS ----
   if (topic === "irrigation/warn") {
     try {
-      lastWarning = JSON.parse(payload.toString());
+      lastWarning = JSON.parse(msg);
     } catch {
-      lastWarning = { message: payload.toString() };
+      lastWarning = { message: msg };
     }
   }
 
+  // ---- PUMP STATUS ----
   if (topic === "irrigation/status") {
+    systemStatus.pump = msg === "ON";
+  }
+
+  // ---- MODE ----
+  if (topic === "irrigation/mode") {
+    systemStatus.mode = msg;
+  }
+
+  // ---- SENSORS ----
+  if (topic === "irrigation/sensors") {
     try {
-      lastStatus = JSON.parse(payload.toString());
+      const data = JSON.parse(msg);
+      systemStatus.temp = data.temp ?? null;
+      systemStatus.soil = data.soil ?? null;
+      systemStatus.light = data.light ?? null;
     } catch {
-      lastStatus = null;
+      // ignore bad payload
     }
   }
 });
 
 module.exports = {
   client,
+
   getLastWarning: () => lastWarning,
   clearWarning: () => {
     lastWarning = null;
   },
+
   getStatus: () => ({
-    mqttConnected: connected,
-    pump: lastStatus?.pump ?? false,
-    mode: lastStatus?.mode ?? "UNKNOWN",
-    temp: lastStatus?.temp ?? null,
-    soil: lastStatus?.soil ?? null,
-    light: lastStatus?.light ?? null,
+    ...systemStatus,
+    stale: Date.now() - lastUpdate > 10000,
   }),
 };

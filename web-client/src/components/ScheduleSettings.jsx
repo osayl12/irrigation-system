@@ -12,8 +12,8 @@ export default function ScheduleSettings() {
       return;
     }
 
-    if (times < 1) {
-      alert("Times per day must be at least 1");
+    if (!Number.isInteger(times) || times < 1 || times > 6) {
+      alert("Times per day must be between 1 and 6");
       return;
     }
 
@@ -21,7 +21,7 @@ export default function ScheduleSettings() {
       await api.post("/web/schedule", {
         start,
         end,
-        times
+        times,
       });
       alert("Schedule saved");
     } catch {
@@ -38,7 +38,7 @@ export default function ScheduleSettings() {
         <input
           type="time"
           value={start}
-          onChange={e => setStart(e.target.value)}
+          onChange={(e) => setStart(e.target.value)}
         />
       </label>
 
@@ -49,7 +49,7 @@ export default function ScheduleSettings() {
         <input
           type="time"
           value={end}
-          onChange={e => setEnd(e.target.value)}
+          onChange={(e) => setEnd(e.target.value)}
         />
       </label>
 
@@ -62,11 +62,12 @@ export default function ScheduleSettings() {
           min="1"
           max="6"
           value={times}
-          onChange={e => setTimes(Number(e.target.value))}
+          onChange={(e) => setTimes(Number(e.target.value))}
         />
       </label>
 
-      <br /><br />
+      <br />
+      <br />
 
       <button onClick={saveSettings}>💾 Save</button>
     </div>

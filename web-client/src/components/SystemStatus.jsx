@@ -15,7 +15,7 @@ export default function SystemStatus() {
     const fetchStatus = async () => {
       try {
         const res = await api.get("/web/status");
-        setStatus(res.data);
+        setStatus((prev) => ({ ...prev, ...res.data }));
       } catch (err) {
         console.error("Failed to fetch status");
       }
@@ -44,14 +44,11 @@ export default function SystemStatus() {
         </strong>
       </p>
 
-      <p>Mode: <strong>{status.mode}</strong></p>
-
       <p>
-        Temperature:{" "}
-        {status.temp !== undefined && status.temp !== null
-          ? `${status.temp} °C`
-          : "N/A"}
+        Mode: <strong>{status.mode}</strong>
       </p>
+
+      <p>Temperature: {status.temp !== null ? `${status.temp} °C` : "N/A"}</p>
 
       <p>
         Soil Moisture:{" "}
