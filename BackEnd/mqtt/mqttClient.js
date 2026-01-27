@@ -1,5 +1,6 @@
 const mqtt = require("mqtt");
 const client = mqtt.connect(process.env.MQTT_URL || "mqtt://localhost:1883");
+const pool = require("../models/db");
 
 let lastWarning = null;
 let lastUpdate = Date.now();
@@ -63,6 +64,47 @@ client.on("message", (topic, payload) => {
     }
   }
 });
+
+const SAMPLE_HOURS = [0, 6, 12, 18];
+let lastSampleKey = null;
+
+setInterval(async () => {
+  try {
+    if (!systemStatus.mqttConnected) return;
+
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+
+    if (!SAMPLE_HOURS.includes(hour)) return;
+    if (minute !== 0) return; // בדיוק בתחילת שעה
+
+    const key = `${now.toDateString()}-${hour}`;
+    if (lastSampleKey === key) return;
+
+    lastSampleKey = key;
+
+    // שמירת 3 דגימות: temp/soil/light לטבלת sensors
+    const potId = 1;
+
+    const inserts = [
+      ["temp", Number(systemStatus.temp ?? -999), potId],
+      ["soil", Number(systemStatus.soil ?? -1), potId],
+      ["light", Number(systemStatus.light ?? -1), potId],
+    ];
+
+    for (const [name, val, id_pot] of inserts) {
+      await pool.execute(
+        `INSERT INTO sensors (SensorName, Val_avg, date, Pot_id)
+         VALUES (?, ?, CURDATE(), ?)`,
+        [name, val, id_pot]
+      );
+    }
+  } catch (e) {
+    // silent
+  }
+}, 1000);
+
 
 module.exports = {
   client,

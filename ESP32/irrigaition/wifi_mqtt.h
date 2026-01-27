@@ -1,6 +1,7 @@
 #ifndef WIFI_MQTT_H
 #define WIFI_MQTT_H
 
+#include <ArduinoJson.h>
 #include "config.h"
 #include "pump.h"
 
@@ -11,19 +12,12 @@ PubSubClient mqtt(espClient);
 /* ===== GLOBALS ===== */
 extern String currentMode;
 extern bool forceOverride;
-extern bool manualOverrideOff;
-
 extern int shabbatTimes;
 extern int shabbatDurationMin;
-extern int currentLight;
-extern bool pumpOn;
-
-// חשוב: אלה מגיעים מ-modes.h ולכן חייב extern כאן
 extern bool shabbatScheduleActive;
 extern int shabbatDoneToday;
 extern bool shabbatRunning;
-
-bool pendingManualOn = false;
+extern int currentLight;
 
 /* ===== WIFI ===== */
 void connectWiFi() {
@@ -35,84 +29,42 @@ void connectWiFi() {
 
 /* ===== MQTT CALLBACK ===== */
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-
   String msg;
-  for (unsigned int i = 0; i < length; i++) {
-    msg += (char)payload[i];
-  }
+  for (unsigned int i = 0; i < length; i++) msg += (char)payload[i];
 
   if (String(topic) == TOPIC_SCHEDULE) {
-    int comma = msg.indexOf(',');
-    if (comma > 0) {
-      shabbatTimes = msg.substring(0, comma).toInt();
-      shabbatDurationMin = msg.substring(comma + 1).toInt();
-
-      // SAVE בוצע -> מפעיל את התזמון בשבת
-      shabbatScheduleActive = true;
-      shabbatDoneToday = 0;
-      shabbatRunning = false;
-    }
+    DynamicJsonDocument doc(256);
+    deserializeJson(doc, msg);
+    shabbatTimes = doc["times"];
+    shabbatDurationMin = doc["duration"];
+    shabbatScheduleActive = true;
+    shabbatDoneToday = 0;
+    shabbatRunning = false;
   }
 
   if (String(topic) == TOPIC_MODE) {
     currentMode = msg;
     forceOverride = false;
-    manualOverrideOff = false;
-
-    // יציאה משבת -> לא לרוץ עד SAVE הבא
-    if (msg != "SHABBAT") {
-      shabbatScheduleActive = false;
-      shabbatRunning = false;
-    }
   }
 
   if (String(topic) == TOPIC_PUMP) {
-
-    // במצב שבת – לא שליטה ידנית
     if (currentMode == "SHABBAT") return;
 
     if (msg == "FORCE_ON") {
       forceOverride = true;
-      manualOverrideOff = false;
-      pendingManualOn = false;
-
-      currentMode = "MANUAL";  
       turnPumpOn();
-    }
-
-
-    else if (msg == "ON") {
-
-      // אם מצב ידני + אור חזק -> התראה, לא מפעיל עד אישור
+    } else if (msg == "ON") {
       if (currentMode == "MANUAL" && currentLight > LIGHT_STRONG_TH) {
-        pendingManualOn = true;
-
-        mqtt.publish(
-          TOPIC_WARN,
-          ("{\"message\":\"Strong light detected. Not recommended to irrigate now\","
-           "\"type\":\"LIGHT\","
-           "\"light_raw\":"
-           + String(currentLight) + "}")
-            .c_str(),
-          true);
-
+        mqtt.publish(TOPIC_WARN,
+                     ("{\"message\":\"Strong light detected\",\"type\":\"LIGHT\",\"light_raw\":" + String(currentLight) + "}").c_str(), true);
         return;
       }
-
-      manualOverrideOff = false;
-      pendingManualOn = false;
       turnPumpOn();
-    }
-
-    else if (msg == "OFF") {
+    } else if (msg == "OFF") {
       forceOverride = false;
-      manualOverrideOff = true;
-      pendingManualOn = false;
       turnPumpOff();
     }
   }
-
-  
 }
 
 /* ===== MQTT CONNECT ===== */

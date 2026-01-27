@@ -6,28 +6,17 @@ export default function ScheduleSettings() {
   const [end, setEnd] = useState("18:00");
   const [times, setTimes] = useState(2);
 
-  const saveSettings = async () => {
-    if (start >= end) {
-      alert("End time must be after start time");
-      return;
-    }
+ const saveSettings = async () => {
+  const duration =
+    Math.floor(
+      (new Date(`1970-01-01T${end}:00`) -
+       new Date(`1970-01-01T${start}:00`)) / 60000 / times
+    );
 
-    if (!Number.isInteger(times) || times < 1 || times > 6) {
-      alert("Times per day must be between 1 and 6");
-      return;
-    }
+  await api.post("/web/schedule", { times, duration });
+  alert("Schedule saved");
+};
 
-    try {
-      await api.post("/web/schedule", {
-        start,
-        end,
-        times,
-      });
-      alert("Schedule saved");
-    } catch {
-      alert("Failed to save schedule");
-    }
-  };
 
   return (
     <div>

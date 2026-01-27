@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { api } from "../api/api";
 
 /*
@@ -18,6 +18,14 @@ const MODES = [
 export default function ModeSelector() {
   const [active, setActive] = useState("MANUAL");
   const [loading, setLoading] = useState(false);
+
+  // סנכרון מצב אמיתי מהשרת
+
+  useEffect(() => {
+    api.get("/web/status").then((res) => {
+      if (res.data.mode) setActive(res.data.mode);
+    });
+  }, []);
 
   const selectMode = async (mode) => {
     if (loading) return;

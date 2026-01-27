@@ -1,25 +1,35 @@
 #ifndef MODES_H
 #define MODES_H
 
+#include <time.h>
 #include "sensors.h"
 #include "pump.h"
 
 extern PubSubClient mqtt;
+
+/* ===== WATER CONSUMPTION ===== */
+// כמה ליטר לדקה המשאבה שלך (תמדוד או תעריך)
+// לדוגמה: 2.0 L/min
+#define PUMP_LITERS_PER_MIN 2.0
+
+/* ===== TEMP MODE SCHEDULE ===== */
+int tempTimes = 0;
+int tempDurationMin = 0;
+int tempDoneToday = 0;
+unsigned long tempStartMillis = 0;
+bool tempRunning = false;
 
 /* ===== STATE ===== */
 String currentMode = "MANUAL";
 bool forceOverride = false;
 bool manualOverrideOff = false;
 
-/* ===== SCHEDULED ("SHABBAT") ===== */
-int shabbatTimes = DEFAULT_TIMES_NORMAL;
-int shabbatDurationMin = DEFAULT_DURATION_NORMAL;
+/* ===== SHABBAT ===== */
+int shabbatTimes = 0;
+int shabbatDurationMin = 0;
 int shabbatDoneToday = 0;
-
 unsigned long shabbatStartMillis = 0;
 bool shabbatRunning = false;
-
-// מתחיל לרוץ רק אחרי SAVE מה-WEB
 bool shabbatScheduleActive = false;
 
 /* ===== STATUS ===== */
@@ -29,77 +39,76 @@ void publishModeStatus() {
 
 /* ===== SHABBAT MODE ===== */
 void handleShabbatMode() {
-  if (!shabbatScheduleActive) return;  
+  if (!shabbatScheduleActive) return;
 
-  unsigned long now = millis();
 
   if (!shabbatRunning && shabbatDoneToday < shabbatTimes) {
     turnPumpOn();
-    shabbatStartMillis = now;
+    shabbatStartMillis = millis();
     shabbatRunning = true;
   }
 
-  if (shabbatRunning &&
-      now - shabbatStartMillis >= (unsigned long)shabbatDurationMin * 60000UL) {
+  /* --- סיום השקיה --- */
+  if (shabbatRunning && millis() - shabbatStartMillis >= (unsigned long)shabbatDurationMin * 60000UL) {
 
     turnPumpOff();
     shabbatRunning = false;
     shabbatDoneToday++;
   }
 
-  // איפוס "יומי" לפי millis 
-  static unsigned long lastReset = 0;
-  if (now - lastReset >= 86400000UL) {
-    shabbatDoneToday = 0;
-    lastReset = now;
+  // איפוס אמיתי לפי תאריך (בחצות)
+  static int lastYday = -1;  // day-of-year האחרון שראינו
+
+  struct tm timeinfo;
+  if (getLocalTime(&timeinfo)) {
+    if (lastYday == -1) {
+      lastYday = timeinfo.tm_yday;  // אתחול פעם ראשונה
+    } else if (timeinfo.tm_yday != lastYday) {
+      // התאריך התחלף => עברנו חצות
+      shabbatDoneToday = 0;
+      lastYday = timeinfo.tm_yday;
+    }
   }
 }
 
 /* ===== MAIN MODE HANDLER ===== */
 void handleMode() {
 
-  static bool wasShabbat = false;
-
   /* ===== SHABBAT ===== */
   if (currentMode == "SHABBAT") {
-
-    // איפוס override-ים
-    manualOverrideOff = false;
-    // במצב שבת לא משחקים בכפייה/ידני
-    forceOverride = false;
-
-    // כניסה חדשה לשבת
-    if (!wasShabbat) {
-      shabbatRunning = false;
-      shabbatDoneToday = 0;
-    }
-
-    wasShabbat = true;
     handleShabbatMode();
     return;
   }
 
-  wasShabbat = false;
-
-  /* ===== NON-SHABBAT ===== */
+  // אם המשתמש כיבה ידנית – לא עושים כלום
   if (manualOverrideOff) return;
 
   switch (currentMode[0]) {
-    case 'M': // MANUAL
-      // השליטה נעשית ב-mqttCallback דרך TOPIC_PUMP
+
+    case 'M':  // MANUAL
+      // השליטה נעשית דרך MQTT (TOPIC_PUMP)
       break;
 
-    case 'T': // TEMP
-      if (!isnan(currentTemp) && currentTemp >= TEMP_HIGH_TH && !isLightStrong())
+    case 'T':  // TEMP
+      if (!tempRunning && tempDoneToday < tempTimes && !isLightStrong()) {
         turnPumpOn();
-      else
+        tempStartMillis = millis();
+        tempRunning = true;
+      }
+
+      if (tempRunning && millis() - tempStartMillis >= (unsigned long)tempDurationMin * 60000UL) {
+
         turnPumpOff();
+        tempRunning = false;
+        tempDoneToday++;
+      }
       break;
 
-    case 'S': // SOIL
-      if (currentSoil <= SOIL_DRY_TH && !isLightStrong())
+    case 'S':  // SOIL
+      if (!pumpOn && currentSoil <= SOIL_DRY_ON && !isLightStrong())
         turnPumpOn();
-      else
+
+      if (pumpOn && currentSoil >= SOIL_WET_OFF)
         turnPumpOff();
       break;
   }

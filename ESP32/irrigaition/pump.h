@@ -14,14 +14,15 @@ void publishPumpStatus() {
 
 void saveIrrigation() {
   unsigned long durationSec = (millis() - pumpStartMillis) / 1000;
+  float liters = (durationSec / 60.0) * PUMP_LITERS_PER_MIN;
 
   HTTPClient http;
   http.begin(String(SERVER_BASE) + "/esp/irrigation");
   http.addHeader("Content-Type", "application/json");
 
- 
+
   String body =
-    "{\"pot_id\":" + String(POT_ID) + ",\"count\":" + String(durationSec) + "}";
+    "{\"pot_id\":" + String(POT_ID) + ",\"count\":" + String(durationSec) + ",\"liters\":" + String(liters, 2) + "}";
 
   http.POST(body);
   http.end();
@@ -35,7 +36,7 @@ void turnPumpOn() {
     //  LOW מפעיל ריליי
     digitalWrite(RELAY_PIN, LOW);
 
-    publishPumpStatus(); // עדכון מיידי ל-WEB
+    publishPumpStatus();  // עדכון מיידי ל-WEB
   }
 }
 
@@ -45,8 +46,8 @@ void turnPumpOff() {
 
     digitalWrite(RELAY_PIN, HIGH);
 
-    saveIrrigation();    // שמירת זמן השקיה
-    publishPumpStatus(); // עדכון מיידי ל-WEB
+    saveIrrigation();     // שמירת זמן השקיה
+    publishPumpStatus();  // עדכון מיידי ל-WEB
   }
 }
 

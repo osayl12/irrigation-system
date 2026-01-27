@@ -101,11 +101,11 @@ const getWeeklyStats = async (req, res) => {
     `;
   } else if (type === "water") {
     sql = `
-      SELECT date, SUM(count) AS avg_value
-      FROM irrigation_system
-      GROUP BY date
-      ORDER BY date
-    `;
+    SELECT date, SUM(liters) AS avg_value
+    FROM irrigation_system
+    GROUP BY date
+    ORDER BY date
+  `;
   }
 
   if (!sql) {
@@ -150,8 +150,6 @@ const setPump = (req, res) => {
   res.json({ success: true });
 };
 
-
-
 /* ===== Mode control ===== */
 const setMode = (req, res) => {
   const { mode } = req.body;
@@ -161,28 +159,17 @@ const setMode = (req, res) => {
 
 /* ===== Schedule ===== */
 const setSchedule = (req, res) => {
-  const { start, end, times } = req.body;
-
-  const [sh, sm] = start.split(":").map(Number);
-  const [eh, em] = end.split(":").map(Number);
-
-  const startMin = sh * 60 + sm;
-  const endMin = eh * 60 + em;
-  const windowMin = endMin - startMin;
-
-  const duration = Math.floor(windowMin / times);
+  const { times, duration } = req.body;
 
   mqtt.client.publish(
     "irrigation/schedule",
-    `${times},${duration}`
+    JSON.stringify({ times, duration }),
   );
 
   res.json({ success: true });
 };
 
-
 module.exports = {
-  
   getSensors,
   getIrrigations,
   deleteSensor,

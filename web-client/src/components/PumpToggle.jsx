@@ -44,7 +44,7 @@ export default function PumpToggle() {
 
   const forceTurnOn = () => {
     api.post("/web/pump", { state: true, force: true }).then(() => {
-      setPumpOn(true); 
+      setPumpOn(true);
       setWarning(null);
     });
   };
@@ -75,7 +75,10 @@ export default function PumpToggle() {
       <LightWarningPopup
         warning={warning}
         onConfirm={forceTurnOn}
-        onCancel={() => setWarning(null)}
+        onCancel={() => {
+          api.post("/web/pump", { state: false });
+          setWarning(null);
+        }}
       />
     </div>
   );

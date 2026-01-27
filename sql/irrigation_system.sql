@@ -35,6 +35,8 @@ CREATE TABLE `irrigation_system` (
   `pot_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+ALTER TABLE irrigation_system
+ADD COLUMN liters FLOAT NOT NULL DEFAULT 0;
 -- --------------------------------------------------------
 
 --

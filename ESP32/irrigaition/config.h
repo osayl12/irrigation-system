@@ -19,6 +19,8 @@
 #define TOPIC_SCHEDULE "irrigation/schedule"
 #define TOPIC_WARN     "irrigation/warn"
 #define TOPIC_STATUS   "irrigation/status"
+#define TOPIC_SENSORS  "irrigation/sensors"
+
 
 /* ===== SERVER ===== */
 #define SERVER_BASE "http://172.20.10.4:3000"
@@ -32,14 +34,16 @@
 
 /* ===== THRESHOLDS ===== */
 #define TEMP_HIGH_TH     30.0
-#define SOIL_DRY_TH      300
 #define LIGHT_STRONG_TH  2000
 
-/* ===== DEFAULT POLICY (לא קשור לשבת) ===== */
-#define DEFAULT_TIMES_NORMAL     2
-#define DEFAULT_DURATION_NORMAL  120
+/* ===== SOIL TARGET (ערך רצוי + היסטרזיס) ===== */
+#define SOIL_TARGET      380
+#define SOIL_HYST        40
+#define SOIL_DRY_ON      (SOIL_TARGET - SOIL_HYST)
+#define SOIL_WET_OFF     (SOIL_TARGET + SOIL_HYST)
 
-#define DEFAULT_TIMES_HOT        3
-#define DEFAULT_DURATION_HOT     180
+/* ===== WATER CONSUMPTION (L/min) ===== */
+#define PUMP_LITERS_PER_MIN  2.0
+
 
 #endif
