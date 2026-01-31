@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
   Filler,
-  Title
+  Title,
 } from "chart.js";
 
 import { Line } from "react-chartjs-2";
@@ -21,7 +21,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 );
 
 export default function WeeklyChart({ title, labels, values }) {
@@ -38,27 +38,27 @@ export default function WeeklyChart({ title, labels, values }) {
         borderColor: "#1976d2",
         backgroundColor: "rgba(25,118,210,0.2)",
         tension: 0.3,
-        fill: true
-      }
-    ]
+        fill: true,
+      },
+    ],
   };
 
   const options = {
     responsive: true,
     plugins: {
       legend: {
-        display: false
+        display: false,
       },
       title: {
         display: true,
-        text: title
-      }
+        text: title,
+      },
     },
     scales: {
       y: {
-        beginAtZero: true
-      }
-    }
+        beginAtZero: true,
+      },
+    },
   };
 
   return <Line data={data} options={options} />;

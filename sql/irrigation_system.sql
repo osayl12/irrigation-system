@@ -36,6 +36,7 @@ CREATE TABLE `irrigation_system` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE irrigation_system
+ALTER TABLE sensors ADD COLUMN time TIME NOT NULL;
 ADD COLUMN liters FLOAT NOT NULL DEFAULT 0;
 -- --------------------------------------------------------
 

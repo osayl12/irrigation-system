@@ -5,7 +5,7 @@ class Web {
   }
 
   /* ---------- READ ---------- */
-  /*
+/*
   getSensors() {
     return this.db.execute("SELECT * FROM sensors ORDER BY id DESC");
   }
@@ -15,7 +15,7 @@ class Web {
   }
 
   /* ---------- DELETE ---------- */
-  /*
+/*
   deleteSensor(id) {
     return this.db.execute("DELETE FROM sensors WHERE id = ?", [id]);
   }
@@ -25,7 +25,7 @@ class Web {
   }
 
   /* ---------- UPDATE ---------- */
-  /*
+/*
   updateSensor(id, fields) {
     const allowed = ["SensorName", "Val_avg", "Pot_id"];
     const keys = Object.keys(fields).filter(k => allowed.includes(k));

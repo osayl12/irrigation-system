@@ -2,21 +2,15 @@ import React, { useState } from "react";
 import { api } from "../api/api";
 
 export default function ScheduleSettings() {
-  const [start, setStart] = useState("06:00");
-  const [end, setEnd] = useState("18:00");
+  const [start, setStart] = useState("10:00");
+  const [end, setEnd] = useState("11:00");
   const [times, setTimes] = useState(2);
+  const [duration, setDuration] = useState(1);
 
- const saveSettings = async () => {
-  const duration =
-    Math.floor(
-      (new Date(`1970-01-01T${end}:00`) -
-       new Date(`1970-01-01T${start}:00`)) / 60000 / times
-    );
-
-  await api.post("/web/schedule", { times, duration });
-  alert("Schedule saved");
-};
-
+  const saveSettings = async () => {
+    await api.post("/web/schedule", { start, end, times, duration });
+    alert("Schedule saved");
+  };
 
   return (
     <div>
@@ -56,8 +50,20 @@ export default function ScheduleSettings() {
       </label>
 
       <br />
-      <br />
 
+      <label>
+        Duration per irrigation (minutes):
+        <input
+          type="number"
+          min="1"
+          max="180"
+          value={duration}
+          onChange={(e) => setDuration(Number(e.target.value))}
+        />
+      </label>
+
+      <br />
+      <br />
       <button onClick={saveSettings}>💾 Save</button>
     </div>
   );

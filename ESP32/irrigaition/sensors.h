@@ -24,8 +24,8 @@ void publishSensors() {
 }
 
 void readSensors() {
-  currentTemp  = dht.readTemperature();
-  currentSoil  = analogRead(SOIL_SENSOR_PIN);
+  currentTemp = dht.readTemperature();
+  currentSoil = analogRead(SOIL_SENSOR_PIN);
   currentLight = analogRead(LIGHT_SENSOR_PIN);
 }
 

@@ -8,24 +8,24 @@ export default function Dashboard() {
   return (
     <>
       <div className="container">
-      <div className="grid">
-        <div className="card">
-          <PumpToggle />
+        <div className="grid">
+          <div className="card">
+            <PumpToggle />
+          </div>
+
+          <div className="card">
+            <SystemStatus />
+          </div>
         </div>
 
         <div className="card">
-          <SystemStatus />
+          <ModeSelector />
+        </div>
+
+        <div className="card">
+          <ScheduleSettings />
         </div>
       </div>
-
-      <div className="card">
-        <ModeSelector />
-      </div>
-
-      <div className="card">
-        <ScheduleSettings />
-      </div>
-    </div>
     </>
   );
 }

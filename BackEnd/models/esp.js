@@ -5,7 +5,7 @@ class Esp {
 
   createSensor(sensor, value, potId) {
     return this.db.execute(
-      `INSERT INTO sensors (SensorName, Val_avg, date, Pot_id)
+      `INSERT INTO sensors (SensorName, Val_avg, time,date, Pot_id)
        VALUES (?, ?, CURDATE(), ?)`,
       [sensor, value, potId],
     );

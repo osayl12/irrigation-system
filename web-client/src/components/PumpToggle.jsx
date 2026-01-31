@@ -24,11 +24,20 @@ export default function PumpToggle() {
 
   /* ===== בדיקת אזהרות ===== */
   useEffect(() => {
-    const fetchWarning = () => {
-      api
-        .get("/web/warnings")
-        .then((res) => setWarning(res.data))
-        .catch(() => {});
+    const fetchWarning = async () => {
+      try {
+        const statusRes = await api.get("/web/status");
+        const mode = statusRes.data?.mode;
+
+        // רק במצב MANUAL מציגים Popup
+        if (mode !== "MANUAL") {
+          setWarning(null);
+          return;
+        }
+
+        const warnRes = await api.get("/web/warnings");
+        setWarning(warnRes.data);
+      } catch {}
     };
 
     fetchWarning();

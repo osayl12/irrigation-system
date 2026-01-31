@@ -1,3 +1,15 @@
+
+/*
+פרויקט : Smart Irrigation System
+
+שם מלא: דינה נאש
+ת.ז: 311487185
+
+שם מלא : אוסיל חאמד
+ת.ז: 208913798
+
+*/
+
 #include "config.h"
 #include "wifi_mqtt.h"
 #include <time.h>
@@ -11,19 +23,19 @@ void setup() {
   Serial.begin(115200);
   dht.begin();
 
- // Israel time: UTC+2 בחורף, UTC+3 בקיץ (DST)
-const long gmtOffset_sec = 2 * 3600;
-const int  daylightOffset_sec = 3600;
+  // Israel time: UTC+2 בחורף, UTC+3 בקיץ (DST)
+  const long gmtOffset_sec = 2 * 3600;
+  const int daylightOffset_sec = 0;
 
-// NTP init
-configTime(gmtOffset_sec, daylightOffset_sec, "pool.ntp.org", "time.nist.gov");
+  // NTP init
+  configTime(gmtOffset_sec, daylightOffset_sec, "pool.ntp.org", "time.nist.gov");
 
-// המתנה קצרה עד שיש זמן תקין
-struct tm timeinfo;
-for (int i = 0; i < 20; i++) {
-  if (getLocalTime(&timeinfo)) break;
-  delay(200);
-}
+  // המתנה קצרה עד שיש זמן תקין
+  struct tm timeinfo;
+  for (int i = 0; i < 20; i++) {
+    if (getLocalTime(&timeinfo)) break;
+    delay(200);
+  }
 
   connectWiFi();
   connectMQTT();
@@ -31,7 +43,7 @@ for (int i = 0; i < 20; i++) {
   // קריאה ראשונית כדי לקבוע ברירת מחדל לפי חום (לא קשור לשבת)
   readSensors();
 
- if (!isnan(currentTemp) && currentTemp >= TEMP_HIGH_TH) {
+  if (!isnan(currentTemp) && currentTemp >= TEMP_HIGH_TH) {
     tempTimes = 3;
     tempDurationMin = 180;
   } else {

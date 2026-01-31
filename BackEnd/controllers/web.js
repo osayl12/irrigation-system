@@ -159,11 +159,11 @@ const setMode = (req, res) => {
 
 /* ===== Schedule ===== */
 const setSchedule = (req, res) => {
-  const { times, duration } = req.body;
+  const { start, end, times, duration } = req.body;
 
   mqtt.client.publish(
     "irrigation/schedule",
-    JSON.stringify({ times, duration }),
+    JSON.stringify({ start, end, times, duration }),
   );
 
   res.json({ success: true });

@@ -75,9 +75,10 @@ setInterval(async () => {
     const now = new Date();
     const hour = now.getHours();
     const minute = now.getMinutes();
+    const second = now.getSeconds();
 
     if (!SAMPLE_HOURS.includes(hour)) return;
-    if (minute !== 0) return; // בדיוק בתחילת שעה
+    if (minute !== 0 || second !== 0) return;
 
     const key = `${now.toDateString()}-${hour}`;
     if (lastSampleKey === key) return;
@@ -93,18 +94,32 @@ setInterval(async () => {
       ["light", Number(systemStatus.light ?? -1), potId],
     ];
 
+    const slotStart = `${String(hour).padStart(2, "0")}:00:00`;
+    const slotEnd = `${String(hour).padStart(2, "0")}:59:59`;
+
     for (const [name, val, id_pot] of inserts) {
+      const [[exists]] = await pool.execute(
+        `SELECT COUNT(*) AS c
+         FROM sensors
+         WHERE date = CURDATE()
+           AND SensorName = ?
+           AND Pot_id = ?
+           AND time BETWEEN ? AND ?`,
+        [name, id_pot, slotStart, slotEnd],
+      );
+
+      if (exists.c > 0) continue;
+
       await pool.execute(
-        `INSERT INTO sensors (SensorName, Val_avg, date, Pot_id)
-         VALUES (?, ?, CURDATE(), ?)`,
-        [name, val, id_pot]
+        `INSERT INTO sensors (SensorName, Val_avg, date, time, Pot_id)
+         VALUES (?, ?, CURDATE(), CURTIME(), ?)`,
+        [name, val, id_pot],
       );
     }
   } catch (e) {
     // silent
   }
 }, 1000);
-
 
 module.exports = {
   client,

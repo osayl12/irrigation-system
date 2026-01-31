@@ -41,9 +41,6 @@ const createIrrigation = async (req, res) => {
   }
 };
 
-
-
-
 module.exports = {
   createSensor,
   createIrrigation,

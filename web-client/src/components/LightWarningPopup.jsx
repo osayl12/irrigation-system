@@ -41,7 +41,7 @@ const overlayStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  zIndex: 999
+  zIndex: 999,
 };
 
 const modalStyle = {
@@ -49,7 +49,7 @@ const modalStyle = {
   padding: "25px",
   borderRadius: "8px",
   width: "350px",
-  textAlign: "center"
+  textAlign: "center",
 };
 
 const confirmBtn = {
@@ -58,7 +58,7 @@ const confirmBtn = {
   border: "none",
   padding: "10px 15px",
   marginRight: "10px",
-  cursor: "pointer"
+  cursor: "pointer",
 };
 
 const cancelBtn = {
@@ -66,5 +66,5 @@ const cancelBtn = {
   color: "#000",
   border: "none",
   padding: "10px 15px",
-  cursor: "pointer"
+  cursor: "pointer",
 };

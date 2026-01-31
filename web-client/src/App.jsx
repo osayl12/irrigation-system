@@ -1,3 +1,14 @@
+/*
+פרויקט : Smart Irrigation System
+
+שם מלא: דינה נאש
+ת.ז: 311487185
+
+שם מלא : אוסיל חאמד
+ת.ז: 208913798
+
+*/
+
 import React from "react";
 import Dashboard from "./pages/Dashboard";
 import StatsPage from "./pages/StatsPage";
