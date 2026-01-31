@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { api } from "../api/api";
 
 export default function SystemStatus() {
+  const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState({
     mqttConnected: false,
     pump: false,
@@ -16,13 +17,14 @@ export default function SystemStatus() {
       try {
         const res = await api.get("/web/status");
         setStatus((prev) => ({ ...prev, ...res.data }));
+        setLoading(false);
       } catch (err) {
         console.error("Failed to fetch status");
       }
     };
 
     fetchStatus();
-    const interval = setInterval(fetchStatus, 3000);
+    const interval = setInterval(fetchStatus, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -48,21 +50,14 @@ export default function SystemStatus() {
         Mode: <strong>{status.mode}</strong>
       </p>
 
-      <p>Temperature: {status.temp !== null ? `${status.temp} °C` : "N/A"}</p>
-
       <p>
-        Soil Moisture:{" "}
-        {status.soil !== undefined && status.soil !== null
-          ? status.soil
-          : "N/A"}
+        Temperature:{" "}
+        {loading ? "Updating..." : status.temp !== null ? `${status.temp} °C` : "N/A"}
       </p>
 
-      <p>
-        Light Level:{" "}
-        {status.light !== undefined && status.light !== null
-          ? status.light
-          : "N/A"}
-      </p>
+      <p>Soil Moisture: {loading ? "Updating..." : status.soil ?? "N/A"}</p>
+
+      <p>Light Level: {loading ? "Updating..." : status.light ?? "N/A"}</p>
     </div>
   );
 }
