@@ -1,6 +1,6 @@
 
 /*
-פרויקט : Smart Irrigation System
+פרויקט : Irrigation System
 
 שם מלא: דינה נאש
 ת.ז: 311487185
@@ -42,6 +42,7 @@ void setup() {
 
   // קריאה ראשונית כדי לקבוע ברירת מחדל לפי חום (לא קשור לשבת)
   readSensors();
+  publishSensors();
 
   if (!isnan(currentTemp) && currentTemp >= TEMP_HIGH_TH) {
     tempTimes = 3;
@@ -56,7 +57,6 @@ void setup() {
 
   publishModeStatus();
   publishPumpStatus();
-  publishSensors();
 }
 
 void loop() {
@@ -81,7 +81,7 @@ void loop() {
   handleMode();
 
   static unsigned long lastPub = 0;
-  if (millis() - lastPub >= 3000) {
+  if (millis() - lastPub >= 1000) {
     publishSensors();
     publishPumpStatus();
     publishModeStatus();

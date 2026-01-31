@@ -1,5 +1,5 @@
 /*
-פרויקט : Smart Irrigation System
+פרויקט : Irrigation System
 
 שם מלא: דינה נאש
 ת.ז: 311487185
