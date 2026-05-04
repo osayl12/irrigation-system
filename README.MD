@@ -111,6 +111,40 @@
 
 ---
 
+## 🚀 הפעלת המערכת
+
+### 1. בסיס נתונים
+```sql
+mysql -u root -p < sql/irrigation_system.sql
+```
+
+### 2. שרת Backend (Node.js)
+```bash
+cd BackEnd
+cp .env.example .env
+npm install
+npm start
+```
+
+### 3. MQTT Broker
+```bash
+mosquitto -c mosquitto.conf
+```
+
+### 4. ממשק Web (React)
+```bash
+cd web-client
+npm install
+npm run dev
+```
+
+### 5. ESP32
+- פתח את `ESP32/irrigaition/irrigaition.ino` ב-Arduino IDE
+- ערוך את `config.h` עם כתובת ה-WiFi וה-MQTT שלך
+- העלה ל-ESP32
+
+---
+
 ## ✅ סיכום
 המערכת מממשת את כל דרישות המטלה:
 - עבודה בזמן אמת
