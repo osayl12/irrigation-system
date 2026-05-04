@@ -23,22 +23,17 @@ void setup() {
   Serial.begin(115200);
   dht.begin();
 
-  // Israel time: UTC+2 בחורף, UTC+3 בקיץ (DST)
-  const long gmtOffset_sec = 2 * 3600;
-  const int daylightOffset_sec = 0;
+  connectWiFi();
+  connectMQTT();
 
-  // NTP init
-  configTime(gmtOffset_sec, daylightOffset_sec, "pool.ntp.org", "time.nist.gov");
+  // Israel time – handles DST automatically (UTC+2 winter, UTC+3 summer)
+  configTzTime("IST-2IDT,M3.4.4/2,M10.5.0", "pool.ntp.org", "time.nist.gov");
 
-  // המתנה קצרה עד שיש זמן תקין
   struct tm timeinfo;
   for (int i = 0; i < 20; i++) {
     if (getLocalTime(&timeinfo)) break;
-    delay(200);
+    delay(500);
   }
-
-  connectWiFi();
-  connectMQTT();
 
   // קריאה ראשונית כדי לקבוע ברירת מחדל לפי חום (לא קשור לשבת)
   readSensors();
