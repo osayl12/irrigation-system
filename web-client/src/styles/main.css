@@ -178,6 +178,28 @@ button.active {
 }
 
 /* ======================================================
+📝 INPUTS
+====================================================== */
+
+input[type="time"],
+input[type="number"],
+input[type="text"] {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  margin-left: 8px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+input[type="time"]:focus,
+input[type="number"]:focus,
+input[type="text"]:focus {
+  border-color: #1976d2;
+}
+
+/* ======================================================
 🧩 GRID
 ====================================================== */
 
@@ -185,6 +207,10 @@ button.active {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
+}
+
+.grid > .card {
+  margin-bottom: 0;
 }
 
 /* ======================================================
