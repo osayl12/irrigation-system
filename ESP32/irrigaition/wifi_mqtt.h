@@ -14,6 +14,7 @@ PubSubClient mqtt(espClient);
 
 extern String currentMode;
 extern bool forceOverride;
+extern bool manualOverrideOff;
 
 extern int shabbatTimesCount;
 extern int shabbatDurationMin;
@@ -56,7 +57,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
   // ---- SCHEDULE (SHABBAT) ----
   if (String(topic) == TOPIC_SCHEDULE) {
-    DynamicJsonDocument doc(256);
+    JsonDocument doc;
     DeserializationError err = deserializeJson(doc, msg);
     if (err) return;
 
@@ -84,6 +85,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   if (String(topic) == TOPIC_MODE) {
     currentMode = msg;
     forceOverride = false;
+    manualOverrideOff = false;
   }
 
   // ---- PUMP ----
@@ -92,6 +94,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
     if (msg == "FORCE_ON") {
       forceOverride = true;
+      manualOverrideOff = false;
       turnPumpOn();
     } else if (msg == "ON") {
       // הגנת אור במצב ידני בלבד: אם אור חזק -> רק אזהרה (לא מפעילים)
@@ -100,9 +103,11 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
                      ("{\"message\":\"Strong light detected\",\"type\":\"LIGHT\",\"light_raw\":" + String(currentLight) + "}").c_str(), true);
         return;
       }
+      manualOverrideOff = false;
       turnPumpOn();
     } else if (msg == "OFF") {
       forceOverride = false;
+      manualOverrideOff = true;
       turnPumpOff();
     }
   }
