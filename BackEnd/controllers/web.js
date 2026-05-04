@@ -112,14 +112,12 @@ const getWeeklyStats = async (req, res) => {
     return res.status(400).json({ message: "Invalid type" });
   }
 
-  const [rows] = await pool.execute(sql);
-
-  res.json(
-    rows.map((r) => ({
-      ...r,
-      mode,
-    })),
-  );
+  try {
+    const [rows] = await pool.execute(sql);
+    res.json(rows.map((r) => ({ ...r, mode })));
+  } catch {
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
 };
 
 /* ===== GET system status ===== */
