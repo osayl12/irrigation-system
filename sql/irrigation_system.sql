@@ -32,12 +32,9 @@ CREATE TABLE `irrigation_system` (
   `date` date NOT NULL,
   `time` time NOT NULL,
   `count` int(11) NOT NULL,
-  `pot_id` int(11) NOT NULL
+  `pot_id` int(11) NOT NULL,
+  `liters` float NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-ALTER TABLE irrigation_system
-ALTER TABLE sensors ADD COLUMN time TIME NOT NULL;
-ADD COLUMN liters FLOAT NOT NULL DEFAULT 0;
 -- --------------------------------------------------------
 
 --
@@ -63,6 +60,7 @@ CREATE TABLE `sensors` (
   `SensorName` varchar(50) NOT NULL,
   `Val_avg` float NOT NULL,
   `date` date NOT NULL,
+  `time` time NOT NULL,
   `Pot_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
