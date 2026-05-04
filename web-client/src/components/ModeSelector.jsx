@@ -52,12 +52,7 @@ export default function ModeSelector() {
           key={m.key}
           onClick={() => selectMode(m.key)}
           disabled={loading}
-          style={{
-            marginRight: "8px",
-            backgroundColor: active === m.key ? "#4caf50" : "#eee",
-            color: active === m.key ? "white" : "black",
-            cursor: loading ? "not-allowed" : "pointer",
-          }}
+          className={active === m.key ? "success active" : "secondary"}
         >
           {m.label}
         </button>
