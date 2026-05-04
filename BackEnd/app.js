@@ -32,6 +32,6 @@ app.get("/", (req, res) => {
 });
 
 
-app.listen(PORT || 3000, () => {
-  console.log(`🚀 Local: http://localhost:${PORT || 3000}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Local: http://localhost:${PORT}`);
 });
