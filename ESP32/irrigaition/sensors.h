@@ -24,6 +24,9 @@ void publishSensors() {
 }
 
 void readSensors() {
+  static unsigned long lastRead = 0;
+  if (millis() - lastRead < 2000) return;
+  lastRead = millis();
   currentTemp = dht.readTemperature();
   currentSoil = analogRead(SOIL_SENSOR_PIN);
   currentLight = analogRead(LIGHT_SENSOR_PIN);
