@@ -56,6 +56,7 @@ const confirmBtn = {
   background: "#d32f2f",
   color: "#fff",
   border: "none",
+  borderRadius: "6px",
   padding: "10px 15px",
   marginRight: "10px",
   cursor: "pointer",
@@ -63,8 +64,9 @@ const confirmBtn = {
 
 const cancelBtn = {
   background: "#aaa",
-  color: "#000",
+  color: "#fff",
   border: "none",
+  borderRadius: "6px",
   padding: "10px 15px",
   cursor: "pointer",
 };
