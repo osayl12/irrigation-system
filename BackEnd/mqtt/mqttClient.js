@@ -89,15 +89,27 @@ setInterval(async () => {
     const potId = 1;
 
     const inserts = [
-      ["temp", Number(systemStatus.temp ?? -999), potId],
-      ["soil", Number(systemStatus.soil ?? -1), potId],
-      ["light", Number(systemStatus.light ?? -1), potId],
+      ["temp", systemStatus.temp, potId],
+      ["soil", systemStatus.soil, potId],
+      ["light", systemStatus.light, potId],
     ];
 
     const slotStart = `${String(hour).padStart(2, "0")}:00:00`;
     const slotEnd = `${String(hour).padStart(2, "0")}:59:59`;
 
-    for (const [name, val, id_pot] of inserts) {
+    for (const [name, rawVal, id_pot] of inserts) {
+      const val = Number(rawVal);
+
+      // אם אין קריאה תקינה מהחיישן (מנותק / סנטינל של ה-ESP: -999 / -1)
+      // מדלגים – אחרת הערכים האלה מזהמים את ה-AVG בגרפים
+      const invalid =
+        rawVal === null ||
+        rawVal === undefined ||
+        Number.isNaN(val) ||
+        val <= -100 ||
+        (name !== "temp" && val < 0);
+      if (invalid) continue;
+
       const [[exists]] = await pool.execute(
         `SELECT COUNT(*) AS c
          FROM sensors
