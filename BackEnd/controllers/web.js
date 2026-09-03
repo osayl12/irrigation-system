@@ -62,7 +62,7 @@ const updateSensor = async (req, res) => {
 
 const updateIrrigation = async (req, res) => {
   try {
-    const allowed = ["count", "pot_id"];
+    const allowed = ["count", "pot_id", "liters"];
     const keys = Object.keys(req.body).filter((k) => allowed.includes(k));
     if (!keys.length) return res.status(400).json({ error: "No valid fields" });
 
@@ -76,36 +76,32 @@ const updateIrrigation = async (req, res) => {
   }
 };
 
-/* ---------- STATS ---------- */
+/* ---------- STATS (last 7 days) ---------- */
 const getWeeklyStats = async (req, res) => {
-  const { type, mode } = req.query;
+  const { type } = req.query;
 
   let sql = "";
+  let params = [];
 
   // === בחירת הנתון ===
-  if (type === "temp") {
+  if (type === "temp" || type === "soil") {
     sql = `
       SELECT date, AVG(Val_avg) AS avg_value
       FROM sensors
-      WHERE SensorName = 'temp'
+      WHERE SensorName = ?
+        AND date >= CURDATE() - INTERVAL 7 DAY
       GROUP BY date
       ORDER BY date
     `;
-  } else if (type === "soil") {
-    sql = `
-      SELECT date, AVG(Val_avg) AS avg_value
-      FROM sensors
-      WHERE SensorName = 'soil'
-      GROUP BY date
-      ORDER BY date
-    `;
+    params = [type];
   } else if (type === "water") {
     sql = `
-    SELECT date, SUM(liters) AS avg_value
-    FROM irrigation_system
-    GROUP BY date
-    ORDER BY date
-  `;
+      SELECT date, SUM(liters) AS avg_value
+      FROM irrigation_system
+      WHERE date >= CURDATE() - INTERVAL 7 DAY
+      GROUP BY date
+      ORDER BY date
+    `;
   }
 
   if (!sql) {
@@ -113,8 +109,8 @@ const getWeeklyStats = async (req, res) => {
   }
 
   try {
-    const [rows] = await pool.execute(sql);
-    res.json(rows.map((r) => ({ ...r, mode })));
+    const [rows] = await pool.execute(sql, params);
+    res.json(rows);
   } catch {
     res.status(500).json({ error: "Failed to fetch stats" });
   }

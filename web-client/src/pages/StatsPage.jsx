@@ -4,14 +4,13 @@ import { api } from "../api/api";
 import WeeklyChart from "../components/WeeklyChart";
 
 export default function StatsPage() {
-  const [mode, setMode] = useState("MANUAL");
   const [metric, setMetric] = useState("water");
   const [labels, setLabels] = useState([]);
   const [values, setValues] = useState([]);
 
   useEffect(() => {
     api
-      .get(`/web/stats/weekly?mode=${mode}&type=${metric}`)
+      .get(`/web/stats/weekly?type=${metric}`)
       .then((res) => {
         setLabels(
           res.data.map((r) => new Date(r.date).toLocaleDateString("he-IL")),
@@ -22,24 +21,11 @@ export default function StatsPage() {
         setLabels([]);
         setValues([]);
       });
-  }, [mode, metric]);
+  }, [metric]);
 
   return (
     <div className="container">
-      <h2>📊 Statistics</h2>
-
-      <div className="card">
-        <h3>Mode</h3>
-        {["MANUAL", "TEMP", "SOIL", "SHABBAT"].map((m) => (
-          <button
-            key={m}
-            className={mode === m ? "primary active" : "secondary"}
-            onClick={() => setMode(m)}
-          >
-            {m}
-          </button>
-        ))}
-      </div>
+      <h2>📊 Statistics (last 7 days)</h2>
 
       <div className="card">
         <h3>Data Type</h3>
@@ -56,7 +42,7 @@ export default function StatsPage() {
 
       <div className="card">
         <WeeklyChart
-          title={`${metric.toUpperCase()} – ${mode}`}
+          title={metric.toUpperCase()}
           labels={labels}
           values={values}
         />
