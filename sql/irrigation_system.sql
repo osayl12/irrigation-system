@@ -21,6 +21,10 @@ SET time_zone = "+00:00";
 -- Database: `irrigation_system`
 --
 
+CREATE DATABASE IF NOT EXISTS `irrigation_system`
+  DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `irrigation_system`;
+
 -- --------------------------------------------------------
 
 --
@@ -156,6 +160,24 @@ ALTER TABLE `pots`
 --
 ALTER TABLE `sensors`
   ADD CONSTRAINT `fk_sensors_pots` FOREIGN KEY (`Pot_id`) REFERENCES `pots` (`id`);
+
+-- --------------------------------------------------------
+
+--
+-- Seed reference data.
+-- Required: irrigation_system.pot_id and sensors.Pot_id are FKs to pots.id,
+-- and the ESP + backend both write rows with pot_id = 1. Without this seed
+-- every sensor/irrigation INSERT fails with a foreign-key violation.
+--
+
+INSERT INTO `strains` (`id`, `type`, `Instructions_list`) VALUES
+  (1, 'default', 'Default strain')
+  ON DUPLICATE KEY UPDATE `type` = VALUES(`type`);
+
+INSERT INTO `pots` (`id`, `Strains_id`, `date`, `name`, `status`) VALUES
+  (1, 1, CURDATE(), 'Pot 1', 1)
+  ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
