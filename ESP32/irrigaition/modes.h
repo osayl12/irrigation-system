@@ -60,17 +60,24 @@ void handleTempMode() {
   resetTempDailyIfNeeded(timeinfo);
   updateTempPlan();
 
-  // הגנת אור: לא להתחיל אם אור חזק
-  if (isLightStrong()) return;
-
-  // אם כבר משקים: לבדוק סיום
+  // אם כבר משקים: קודם כל בודקים סיום (חייב לרוץ לפני בדיקת האור,
+  // אחרת השקיה שנקטעה ע"י אור חזק נשארת "פעילה" לנצח ולא מתאפסת)
   if (tempRunning) {
     if (millis() - tempStartMillis >= (unsigned long)tempDurationMin * 60000UL) {
       turnPumpOff();
       tempRunning = false;
+    } else if (isLightStrong()) {
+      // השהיה זמנית: המשאבה כבויה אך משך הזמן ממשיך לרוץ
+      if (pumpOn) turnPumpOff();
+    } else if (!pumpOn) {
+      // האור נחלש והזמן עוד לא נגמר – ממשיכים את ההשקיה
+      turnPumpOn();
     }
     return;
   }
+
+  // הגנת אור: לא להתחיל השקיה חדשה באור חזק
+  if (isLightStrong()) return;
 
   // לא משקים כרגע: לבדוק אם הגיע הזמן של השקיה הבאה
   int h = timeinfo.tm_hour;
@@ -135,15 +142,33 @@ void handleShabbatMode() {
   static int lastYday = -1;
   if (lastYday == -1) lastYday = timeinfo.tm_yday;
   else if (timeinfo.tm_yday != lastYday) {
+    if (shabbatRunning) turnPumpOff();
     shabbatDoneToday = 0;
     shabbatRunning = false;
     lastYday = timeinfo.tm_yday;
   }
 
+  // סיום השקיה פעילה – חייב לרוץ לפני בדיקת הטווח שלמטה,
+  // אחרת השקיה שחורגת מעבר לסוף החלון לא מגיעה לבדיקת הכיבוי והמשאבה נתקעת דולקת
+  if (shabbatRunning &&
+      millis() - shabbatStartMillis >= (unsigned long)shabbatDurationMin * 60000UL) {
+    turnPumpOff();
+    shabbatRunning = false;
+    shabbatDoneToday++;
+  }
+
   int nowMin = timeinfo.tm_hour * 60 + timeinfo.tm_min;
 
   // מחוץ לטווח זמן שהלקוח בחר
-  if (nowMin < shabbatStartMin || nowMin > shabbatEndMin) return;
+  if (nowMin < shabbatStartMin || nowMin > shabbatEndMin) {
+    // בטיחות: אם עדיין דולקים אחרי סוף החלון – לכבות
+    if (shabbatRunning) {
+      turnPumpOff();
+      shabbatRunning = false;
+      shabbatDoneToday++;
+    }
+    return;
+  }
 
   if (shabbatTimesCount <= 0 || shabbatDurationMin <= 0) return;
 
@@ -160,13 +185,6 @@ void handleShabbatMode() {
     turnPumpOn();
     shabbatStartMillis = millis();
     shabbatRunning = true;
-  }
-
-  // סיום השקיה
-  if (shabbatRunning && millis() - shabbatStartMillis >= (unsigned long)shabbatDurationMin * 60000UL) {
-    turnPumpOff();
-    shabbatRunning = false;
-    shabbatDoneToday++;
   }
 }
 
