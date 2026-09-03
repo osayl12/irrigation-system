@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const c = require("../controllers/web");
-const mqttClient = require("../mqtt/mqttClient");
 
 // למרות שזה לא שמושי
 router.get("/sensors", c.getSensors);
@@ -17,17 +16,13 @@ router.patch("/irrigations/:id", c.updateIrrigation);
 router.get("/stats/weekly", c.getWeeklyStats);
 
 // ===== WARNINGS =====
-router.get("/warnings", (req, res) => {
-  res.json(mqttClient.getLastWarning());
-});
+router.get("/warnings", c.getWarnings);
 
 router.post("/pump", c.setPump);
 router.post("/mode", c.setMode);
 router.post("/schedule", c.setSchedule);
 
 // ===== SYSTEM STATUS =====
-router.get("/status", (req, res) => {
-  res.json(mqttClient.getStatus());
-});
+router.get("/status", c.getStatus);
 
 module.exports = router;
