@@ -171,6 +171,24 @@ npm run dev
 
 ---
 
+## 🐳 Docker / Deployment
+
+הרצה מקומית של כל ה-stack (DB + MQTT + API + Web):
+```bash
+docker compose up --build
+# http://localhost:8083
+```
+
+פריסה לענן (Oracle VM) מתבצעת אוטומטית ב-GitHub Actions בכל push ל-main:
+`.github/workflows/deploy.yml` בונה שני images (`irrigation-system-api`,
+`irrigation-system-web`), דוחף ל-Docker Hub, ואז מתחבר ב-SSH ל-VM ומריץ
+`docker compose up -d`. ה-container של ה-Web מאזין על פורט `8083` וה-reverse
+proxy של ה-VM מפנה אליו את `irrigation-system.duckdns.org`.
+
+> ללא ESP32 מחובר אין נתוני חיישנים חיים – האתר עולה ומציג מצב "אין נתונים".
+
+---
+
 ## ✅ סיכום
 
 המערכת מממשת את כל דרישות המטלה:
