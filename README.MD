@@ -122,6 +122,7 @@ mysql -u root -p < sql/irrigation_system.sql
 ```bash
 cd BackEnd
 npm install
+cp .env.example .env   # ערוך את פרטי החיבור ל-MySQL וה-MQTT
 npm start
 ```
 
