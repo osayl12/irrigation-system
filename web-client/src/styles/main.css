@@ -1,235 +1,629 @@
-/* ======================================================
-🌱 GLOBAL STYLES
-הגדרות בסיס לכל האפליקציה
-====================================================== */
+/* ============================================================
+   Smart Irrigation System — design tokens
+   Palette grounded in the system's own domain: soil (base),
+   leaf/growth, water/moisture and sun/light-warning — the three
+   things the ESP32 actually senses and reacts to.
+   ============================================================ */
+
+:root {
+  --soil-950: #15120d;
+  --soil-900: #1b170f;
+  --soil-850: #201a12;
+  --soil-800: #272016;
+  --soil-750: #31291a;
+  --soil-700: #3c331f;
+
+  --leaf-500: #6cbf5c;
+  --leaf-600: #5aa84c;
+
+  --water-400: #5cb7df;
+
+  --sun-500: #e2a13a;
+
+  --danger-500: #d9654a;
+
+  --paper-100: #efe8da;
+  --paper-300: #cfc4ac;
+  --paper-400: #a89c85;
+  --paper-600: #766c5a;
+
+  --font-ui: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --radius: 10px;
+  --radius-sm: 7px;
+  --edge: 3px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: #f4f6f8;
-  color: #333;
+  font-family: var(--font-ui);
+  background: var(--soil-950);
+  background-image:
+    radial-gradient(ellipse 900px 500px at 12% -10%, rgba(108, 191, 92, 0.07), transparent),
+    radial-gradient(ellipse 700px 480px at 100% 0%, rgba(92, 183, 223, 0.05), transparent);
+  background-attachment: fixed;
+  color: var(--paper-100);
+  -webkit-font-smoothing: antialiased;
 }
 
+h1,
 h2,
 h3 {
-  margin-top: 0;
+  margin: 0 0 4px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-/* ======================================================
-🧭 NAVBAR
-תפריט עליון ראשי
-====================================================== */
+p {
+  line-height: 1.5;
+  color: var(--paper-300);
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--leaf-500);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Navbar
+   ============================================================ */
 
 .navbar {
-  background: linear-gradient(135deg, #1976d2, #1565c0);
-  color: white;
+  background: var(--soil-900);
+  border-bottom: 1px solid var(--soil-700);
   padding: 14px 24px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
-/* קונטיינר פנימי */
 .nav-inner {
-  max-width: 1100px;
+  max-width: 1040px;
   margin: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-/* לוגו / שם מערכת */
-.logo {
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
-/* אזור קישורים */
+.brand-mark {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
+  gap: 4px;
 }
 
-/* קישורים */
 .nav-links a {
-  color: white;
+  color: var(--paper-400);
   text-decoration: none;
-  margin-left: 20px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-
-  padding-bottom: 4px;
-  border-bottom: 2px solid transparent;
-
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
   transition:
-    border-color 0.2s ease,
-    opacity 0.2s ease,
-    transform 0.1s ease;
+    color 0.15s ease,
+    background-color 0.15s ease;
 }
 
-/* מעבר עכבר */
 .nav-links a:hover {
-  opacity: 0.9;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+  color: var(--paper-100);
+  background: var(--soil-800);
 }
 
-/* לחיצה */
-.nav-links a:active {
-  transform: translateY(1px);
-}
-
-/* קישור פעיל (NavLink) */
 .nav-links a.active {
-  border-bottom: 2px solid #ffffff;
-  font-weight: bold;
+  color: var(--soil-950);
+  background: var(--leaf-500);
+  font-weight: 600;
 }
 
-/* ======================================================
-📐 LAYOUT
-====================================================== */
+/* ============================================================
+   Layout
+   ============================================================ */
 
 .container {
-  max-width: 1100px;
+  max-width: 1040px;
   margin: auto;
-  padding: 20px;
+  padding: 28px 20px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-/* ======================================================
-🧱 CARDS
-כרטיסים בדשבורד
-====================================================== */
-
-.card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
 }
 
-/* ======================================================
-🔘 BUTTONS
-====================================================== */
+/* ============================================================
+   Panels ("modules") — an equipment-panel language: a coloured
+   edge names what kind of module it is, rather than one uniform
+   card + drop-shadow treatment for everything.
+   ============================================================ */
 
-button {
+.panel {
+  background: var(--soil-850);
+  border: 1px solid var(--soil-700);
+  border-left: var(--edge) solid var(--soil-700);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+}
+
+.panel--telemetry {
+  border-left-color: var(--water-400);
+}
+
+.panel--pump {
+  border-left-color: var(--leaf-500);
+}
+
+.panel--mode {
+  border-left-color: var(--sun-500);
+}
+
+.panel--schedule {
+  border-left-color: var(--paper-400);
+}
+
+.panel h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--paper-400);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* ============================================================
+   LED status dots
+   ============================================================ */
+
+.led {
+  --led-color: var(--danger-500);
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--led-color);
+  box-shadow: 0 0 0 3px rgba(217, 101, 74, 0.2);
+  flex: none;
+}
+
+.led--on {
+  --led-color: var(--leaf-500);
+  box-shadow: 0 0 0 3px rgba(108, 191, 92, 0.22);
+}
+
+.led--off {
+  --led-color: var(--danger-500);
+  box-shadow: 0 0 0 3px rgba(217, 101, 74, 0.2);
+}
+
+.led--stale {
+  animation: led-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes led-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+}
+
+/* ============================================================
+   Telemetry (top status readout)
+   ============================================================ */
+
+.telemetry__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.telemetry__link {
+  font-size: 13px;
+  color: var(--paper-400);
+}
+
+.telemetry__mode {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--paper-100);
+  background: var(--soil-750);
+  border: 1px solid var(--soil-700);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 20px;
+}
+
+.readout__value {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: clamp(26px, 4vw, 34px);
+  color: var(--paper-100);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.readout__value small {
+  font-size: 0.5em;
+  font-weight: 500;
+  color: var(--paper-400);
+  margin-left: 3px;
+}
+
+.readout__label {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--paper-600);
+}
+
+.readout--water .readout__value {
+  color: var(--water-400);
+}
+
+.readout--sun .readout__value {
+  color: var(--sun-500);
+}
+
+/* ============================================================
+   Pump toggle switch
+   ============================================================ */
+
+.pump-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.switch {
+  appearance: none;
   border: none;
-  border-radius: 6px;
-  padding: 10px 15px;
-  margin: 5px;
+  background: none;
+  padding: 0;
   cursor: pointer;
+  width: 56px;
+  height: 30px;
+}
+
+.switch__track {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--soil-700);
+  border: 1px solid var(--soil-700);
+  position: relative;
+  transition: background-color 0.18s ease;
+}
+
+.switch--on .switch__track {
+  background: var(--leaf-600);
+  border-color: var(--leaf-600);
+}
+
+.switch__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--paper-100);
+  transition: transform 0.18s ease;
+}
+
+.switch--on .switch__thumb {
+  transform: translateX(26px);
+}
+
+.switch:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.pump-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+/* ============================================================
+   Segmented control (mode picker / stats metric picker)
+   ============================================================ */
+
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--soil-700);
+  border-radius: var(--radius-sm);
+  background: var(--soil-800);
+}
+
+.segmented__item {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--paper-400);
+  font-family: var(--font-ui);
   font-size: 14px;
-
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   transition:
-    opacity 0.2s ease,
-    transform 0.1s ease;
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
-/* מעבר עכבר */
-button:hover {
-  opacity: 0.9;
+.segmented__item:hover:not(.is-active):not(:disabled) {
+  color: var(--paper-100);
 }
 
-/* לחיצה */
-button:active {
-  transform: scale(0.97);
+.segmented__item.is-active {
+  background: var(--sun-500);
+  color: var(--soil-950);
 }
 
-/* סוגי כפתורים */
-button.primary {
-  background: #1976d2;
-  color: white;
+.segmented--metric .segmented__item.is-active {
+  background: var(--water-400);
 }
 
-button.success {
-  background: #2e7d32;
-  color: white;
+.segmented__item:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
-button.secondary {
-  background: #9e9e9e;
-  color: white;
+/* ============================================================
+   Buttons
+   ============================================================ */
+
+.btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    transform 0.08s ease;
 }
 
-/* מצב פעיל */
-button.active {
-  outline: 3px solid #1976d2;
+.btn:active {
+  transform: scale(0.98);
 }
 
-/* ======================================================
-📡 SYSTEM STATUS
-====================================================== */
-
-.status-ok {
-  color: #2e7d32;
-  font-weight: bold;
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
-.status-warn {
-  color: #ed6c02;
-  font-weight: bold;
+.btn--primary {
+  background: var(--leaf-500);
+  color: var(--soil-950);
 }
 
-.status-off {
-  color: #c62828;
-  font-weight: bold;
+.btn--primary:hover:not(:disabled) {
+  filter: brightness(1.08);
 }
 
-/* ======================================================
-📝 INPUTS
-====================================================== */
+.btn--danger {
+  background: var(--danger-500);
+  color: var(--paper-100);
+}
+
+.btn--danger:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--soil-700);
+  color: var(--paper-300);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  border-color: var(--paper-400);
+  color: var(--paper-100);
+}
+
+/* ============================================================
+   Schedule fields
+   ============================================================ */
+
+.schedule {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--paper-600);
+}
+
+.field-actions {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   Inputs
+   ============================================================ */
 
 input[type="time"],
 input[type="number"],
 input[type="text"] {
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 8px 10px;
+  font-family: var(--font-mono);
+  background: var(--soil-800);
+  border: 1px solid var(--soil-700);
+  color: var(--paper-100);
+  border-radius: var(--radius-sm);
+  padding: 9px 10px;
   font-size: 14px;
-  margin-left: 8px;
   outline: none;
-  transition: border-color 0.2s ease;
+  color-scheme: dark;
+  transition: border-color 0.15s ease;
 }
 
-input[type="time"]:focus,
-input[type="number"]:focus,
-input[type="text"]:focus {
-  border-color: #1976d2;
+input:focus {
+  border-color: var(--water-400);
 }
 
-/* ======================================================
-🧩 GRID
-====================================================== */
+/* ============================================================
+   Modal (light-protection warning)
+   ============================================================ */
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 10, 6, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
 }
 
-.grid > .card {
-  margin-bottom: 0;
+.modal {
+  background: var(--soil-850);
+  border: 1px solid var(--soil-700);
+  border-top: var(--edge) solid var(--sun-500);
+  border-radius: var(--radius);
+  padding: 26px;
+  width: 100%;
+  max-width: 360px;
 }
 
-/* ======================================================
-📱 RESPONSIVE – מובייל
-====================================================== */
+.modal h3 {
+  color: var(--sun-500);
+  font-size: 17px;
+}
 
-@media (max-width: 600px) {
-  .nav-inner {
-    flex-direction: column;
-    align-items: flex-start;
+.modal p {
+  font-size: 14px;
+}
+
+.modal__meta {
+  font-family: var(--font-mono);
+  color: var(--paper-100) !important;
+}
+
+.modal__actions {
+  margin-top: 22px;
+  display: flex;
+  gap: 10px;
+}
+
+/* ============================================================
+   Chart panel
+   ============================================================ */
+
+.chart-wrap {
+  position: relative;
+  height: 320px;
+}
+
+.empty-state {
+  color: var(--paper-400);
+  font-size: 14px;
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* ============================================================
+   Stats page header
+   ============================================================ */
+
+.page-header {
+  margin-bottom: 6px;
+}
+
+.page-header p {
+  margin-top: 2px;
+  font-size: 14px;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .telemetry__mode {
+    margin-left: 0;
+  }
+
+  .readouts {
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
   }
 
-  .nav-links {
-    width: 100%;
-  }
-
-  .nav-links a {
-    margin-left: 0;
-    margin-right: 15px;
+  .readout__value {
+    font-size: 20px;
   }
 }

@@ -3,6 +3,12 @@ import { useState, useEffect } from "react";
 import { api } from "../api/api";
 import WeeklyChart from "../components/WeeklyChart";
 
+const METRICS = [
+  { key: "water", label: "Water" },
+  { key: "temp", label: "Temperature" },
+  { key: "soil", label: "Soil moisture" },
+];
+
 export default function StatsPage() {
   const [metric, setMetric] = useState("water");
   const [labels, setLabels] = useState([]);
@@ -23,30 +29,35 @@ export default function StatsPage() {
       });
   }, [metric]);
 
+  const activeMetric = METRICS.find((m) => m.key === metric);
+
   return (
     <div className="container">
-      <h2>📊 Statistics (last 7 days)</h2>
-
-      <div className="card">
-        <h3>Data Type</h3>
-        {["water", "temp", "soil"].map((t) => (
-          <button
-            key={t}
-            className={metric === t ? "success active" : "secondary"}
-            onClick={() => setMetric(t)}
-          >
-            {t}
-          </button>
-        ))}
+      <div className="page-header">
+        <h2>Statistics</h2>
+        <p>Last 7 days</p>
       </div>
 
-      <div className="card">
-        <WeeklyChart
-          title={metric.toUpperCase()}
-          labels={labels}
-          values={values}
-        />
-      </div>
+      <section className="panel">
+        <div className="segmented segmented--metric" role="tablist" aria-label="Metric">
+          {METRICS.map((m) => (
+            <button
+              key={m.key}
+              role="tab"
+              aria-selected={metric === m.key}
+              className={`segmented__item ${metric === m.key ? "is-active" : ""}`}
+              onClick={() => setMetric(m.key)}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <h3>{activeMetric.label}{metric === "water" ? " usage" : ""}</h3>
+        <WeeklyChart metric={metric} labels={labels} values={values} />
+      </section>
     </div>
   );
 }

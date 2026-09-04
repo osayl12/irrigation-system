@@ -14,57 +14,59 @@ export default function ScheduleSettings() {
 
   return (
     <div>
-      <h3>Irrigation Schedule</h3>
+      <h3>Scheduled watering</h3>
 
-      <label>
-        Start:
-        <input
-          type="time"
-          value={start}
-          onChange={(e) => setStart(e.target.value)}
-        />
-      </label>
+      <div className="schedule">
+        <div className="field">
+          <label htmlFor="sch-start">Start</label>
+          <input
+            id="sch-start"
+            type="time"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+          />
+        </div>
 
-      <br />
+        <div className="field">
+          <label htmlFor="sch-end">End</label>
+          <input
+            id="sch-end"
+            type="time"
+            value={end}
+            onChange={(e) => setEnd(e.target.value)}
+          />
+        </div>
 
-      <label>
-        End:
-        <input
-          type="time"
-          value={end}
-          onChange={(e) => setEnd(e.target.value)}
-        />
-      </label>
+        <div className="field">
+          <label htmlFor="sch-times">Times per day</label>
+          <input
+            id="sch-times"
+            type="number"
+            min="1"
+            max="6"
+            value={times}
+            onChange={(e) => setTimes(Number(e.target.value))}
+          />
+        </div>
 
-      <br />
+        <div className="field">
+          <label htmlFor="sch-duration">Duration (min)</label>
+          <input
+            id="sch-duration"
+            type="number"
+            min="1"
+            max="180"
+            value={duration}
+            onChange={(e) => setDuration(Number(e.target.value))}
+          />
+        </div>
 
-      <label>
-        Times per day:
-        <input
-          type="number"
-          min="1"
-          max="6"
-          value={times}
-          onChange={(e) => setTimes(Number(e.target.value))}
-        />
-      </label>
-
-      <br />
-
-      <label>
-        Duration per irrigation (minutes):
-        <input
-          type="number"
-          min="1"
-          max="180"
-          value={duration}
-          onChange={(e) => setDuration(Number(e.target.value))}
-        />
-      </label>
-
-      <br />
-      <br />
-      <button onClick={saveSettings}>💾 Save</button>
+        <div className="field-actions">
+          <button className="btn btn--primary" onClick={saveSettings}>
+            Save schedule
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -9,10 +9,10 @@ import { api } from "../api/api";
   SHABBAT – השקיה מתוזמנת בלבד (ללא חיישנים)
 */
 const MODES = [
-  { key: "MANUAL", label: "🖐 Manual" },
-  { key: "TEMP", label: "🌡 Temperature" },
-  { key: "SOIL", label: "🌱 Soil Moisture" },
-  { key: "SHABBAT", label: "🕯 Shabbat" },
+  { key: "MANUAL", glyph: "🖐", label: "Manual" },
+  { key: "TEMP", glyph: "🌡", label: "Temperature" },
+  { key: "SOIL", glyph: "🌱", label: "Soil moisture" },
+  { key: "SHABBAT", glyph: "🕯", label: "Shabbat" },
 ];
 
 export default function ModeSelector() {
@@ -45,18 +45,23 @@ export default function ModeSelector() {
 
   return (
     <div>
-      <h3>Mode Selection</h3>
+      <h3>Mode</h3>
 
-      {MODES.map((m) => (
-        <button
-          key={m.key}
-          onClick={() => selectMode(m.key)}
-          disabled={loading}
-          className={active === m.key ? "success active" : "secondary"}
-        >
-          {m.label}
-        </button>
-      ))}
+      <div className="segmented" role="tablist" aria-label="Irrigation mode">
+        {MODES.map((m) => (
+          <button
+            key={m.key}
+            role="tab"
+            aria-selected={active === m.key}
+            onClick={() => selectMode(m.key)}
+            disabled={loading}
+            className={`segmented__item ${active === m.key ? "is-active" : ""}`}
+          >
+            <span aria-hidden="true">{m.glyph}</span>
+            {m.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

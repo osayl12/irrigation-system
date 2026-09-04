@@ -10,6 +10,7 @@ export default function SystemStatus() {
     temp: null,
     soil: null,
     light: null,
+    stale: false,
   });
 
   useEffect(() => {
@@ -28,36 +29,44 @@ export default function SystemStatus() {
     return () => clearInterval(interval);
   }, []);
 
+  const linkStale = status.mqttConnected && status.stale;
+  const linkOk = status.mqttConnected && !status.stale;
+
   return (
-    <div>
-      <h3>System Status</h3>
+    <div className="telemetry">
+      <div className="telemetry__header">
+        <span
+          className={`led ${linkOk ? "led--on" : "led--off"} ${linkStale ? "led--stale" : ""}`}
+        />
+        <span className="telemetry__link">
+          {!status.mqttConnected ? "Link lost" : linkStale ? "Link stale" : "Link established"}
+        </span>
+        <span className="telemetry__mode">{status.mode}</span>
+      </div>
 
-      <p>
-        MQTT:{" "}
-        <strong style={{ color: status.mqttConnected ? "green" : "red" }}>
-          {status.mqttConnected ? "CONNECTED" : "DISCONNECTED"}
-        </strong>
-      </p>
+      <div className="readouts">
+        <div className="readout">
+          <span className="readout__value">
+            {loading || status.temp === null ? "--" : status.temp}
+            <small>°C</small>
+          </span>
+          <span className="readout__label">Temp</span>
+        </div>
 
-      <p>
-        Pump:{" "}
-        <strong style={{ color: status.pump ? "green" : "red" }}>
-          {status.pump ? "ON" : "OFF"}
-        </strong>
-      </p>
+        <div className="readout readout--water">
+          <span className="readout__value">
+            {loading || status.soil === null ? "--" : status.soil}
+          </span>
+          <span className="readout__label">Soil</span>
+        </div>
 
-      <p>
-        Mode: <strong>{status.mode}</strong>
-      </p>
-
-      <p>
-        Temperature:{" "}
-        {loading ? "Updating..." : status.temp !== null ? `${status.temp} °C` : "N/A"}
-      </p>
-
-      <p>Soil Moisture: {loading ? "Updating..." : status.soil ?? "N/A"}</p>
-
-      <p>Light Level: {loading ? "Updating..." : status.light ?? "N/A"}</p>
+        <div className="readout readout--sun">
+          <span className="readout__value">
+            {loading || status.light === null ? "--" : status.light}
+          </span>
+          <span className="readout__label">Light</span>
+        </div>
+      </div>
     </div>
   );
 }

@@ -66,20 +66,27 @@ export default function PumpToggle() {
 
   return (
     <div>
-      <h3>Pump Control</h3>
+      <h3>Pump</h3>
 
-      <button onClick={turnOn} disabled={pumpOn}>
-        ON
-      </button>
+      <div className="pump-row">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={pumpOn}
+          aria-label="Pump power"
+          className={`switch ${pumpOn ? "switch--on" : ""}`}
+          onClick={() => (pumpOn ? turnOff() : turnOn())}
+        >
+          <span className="switch__track">
+            <span className="switch__thumb" />
+          </span>
+        </button>
 
-      <button onClick={turnOff}>OFF</button>
-
-      <p>
-        Status:
-        <span style={{ color: pumpOn ? "green" : "red" }}>
-          {pumpOn ? " ON" : " OFF"}
+        <span className="pump-state">
+          <span className={`led ${pumpOn ? "led--on" : "led--off"}`} />
+          {pumpOn ? "Running" : "Idle"}
         </span>
-      </p>
+      </div>
 
       <LightWarningPopup
         warning={warning}

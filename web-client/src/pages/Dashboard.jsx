@@ -6,26 +6,24 @@ import SystemStatus from "../components/SystemStatus";
 
 export default function Dashboard() {
   return (
-    <>
-      <div className="container">
-        <div className="grid">
-          <div className="card">
-            <PumpToggle />
-          </div>
+    <div className="container">
+      <section className="panel panel--telemetry">
+        <SystemStatus />
+      </section>
 
-          <div className="card">
-            <SystemStatus />
-          </div>
-        </div>
+      <div className="row">
+        <section className="panel panel--pump">
+          <PumpToggle />
+        </section>
 
-        <div className="card">
+        <section className="panel panel--mode">
           <ModeSelector />
-        </div>
-
-        <div className="card">
-          <ScheduleSettings />
-        </div>
+        </section>
       </div>
-    </>
+
+      <section className="panel panel--schedule">
+        <ScheduleSettings />
+      </section>
+    </div>
   );
 }
